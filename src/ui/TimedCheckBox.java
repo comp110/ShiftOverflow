@@ -1,4 +1,4 @@
-package comp110;
+package ui;
 
 import javafx.scene.control.CheckBox;
 

@@ -1,8 +1,11 @@
-package comp110;
+package tests;
 
 import static org.junit.Assert.*;
 import java.io.File;
 import org.junit.*;
+
+import comp110.Storage;
+import comp110.Storage.StorageListener;
 
 public class StorageTest {
 

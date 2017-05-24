@@ -1,6 +1,7 @@
 package comp110;
 
 import javafx.application.Application;
+import ui.UI;
 
 public class Main {
 

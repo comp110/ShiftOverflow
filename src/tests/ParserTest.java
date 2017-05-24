@@ -1,7 +1,12 @@
-package comp110;
+package tests;
 
 import static org.junit.Assert.*;
 import org.junit.*;
+
+import comp110.Employee;
+import comp110.Parser;
+import comp110.Schedule;
+import comp110.Shift;
 
 /* Created By Keith Whitley */
 

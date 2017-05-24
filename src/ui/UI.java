@@ -1,6 +1,12 @@
-package comp110;
+package ui;
 
 import java.util.*;
+
+import comp110.Controller;
+import comp110.Credentials;
+import comp110.Employee;
+import comp110.Schedule;
+import comp110.Week;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -27,6 +33,7 @@ public class UI extends Application {
 	private Schedule _schedule;
 	private boolean _scheduleStageIsOpen;
 	private ScheduleStage _scheduleStage;
+	private ViewSwapsStage _viewSwapsStage; 
 
 
 	@Override
@@ -36,7 +43,7 @@ public class UI extends Application {
 
 		// create the dialog to collect github username/password
 		// and show it as the first thing
-		_passwordStage = new KarenStage("Password", _controller, null, null);
+		_passwordStage = new KarenStage("Password", _controller, null);
 		Group passwordGroup = new Group();
 		Scene passwordScene = new Scene(passwordGroup);
 		_passwordStage.setScene(passwordScene);
@@ -100,13 +107,18 @@ public class UI extends Application {
 		//update the schedule
 		_schedule = schedule;
 		//open a new one with the refreshed schedule
-		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _currentEmployee, _controller, this);
+		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _controller, this);
 	}
 
+  // called from the controller when an Employee object is ready for
+  // display
 	public void displayAvailable(Employee employee) {
-		// called from the controller when an Employee object is ready for
-		// display
-		_availabilityStage = new AvailabilityStage("COMP110 TA Availability", employee, _controller, this);
+	  _currentEmployee = employee;
+	  //if one is already open we close it
+	  if (_availabilityStage != null){
+	    _availabilityStage.close();
+	  }
+		_availabilityStage = new AvailabilityStage("COMP110 TA Availability", _controller, this);
 		_availabilityStage.show();
 	}
 
@@ -117,7 +129,10 @@ public class UI extends Application {
 			return;
 		}
 		
-		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _currentEmployee, _controller, this);
+		if (_scheduleStageIsOpen) { // don't want to open another one if we already have one
+		  return;
+		}
+		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _controller, this);
 		// once we have the schedule we can enable the other buttons
 		// TODO perhaps changes this so that schedule is available from the
 		// start
@@ -131,9 +146,13 @@ public class UI extends Application {
 			this.displayMessage("There is no schedule loaded yet. A schedule must be loaded before swapping.");
 			return;
 		}
+		// close any open view swap stages
+		if (_viewSwapsStage != null) {
+		  _viewSwapsStage.close();
+		}
 		
 		// show the potential swaps
-		new ViewSwapsStage("Available for Swaps", _currentEmployee, _controller, this);
+		_viewSwapsStage = new ViewSwapsStage("Available for Swaps", _controller, this);
 	}
 
 	public Credentials getUsernamePassword() {
@@ -193,7 +212,7 @@ public class UI extends Application {
 		yes.defaultButtonProperty().bind(yes.focusedProperty());
 		yes.setOnAction((event) -> {
 			_currentEmployee = new Employee("", _availabilityStage.getOnyenField().getText(), 0, false, 0, new int[7][24]);
-			_availabilityStage.renderAvailabilityStage(_currentEmployee);
+			_availabilityStage.renderAvailabilityStage();
 			dialogueBox.close();
 		});
 		Button no = new Button("No");
@@ -294,6 +313,10 @@ public class UI extends Application {
 	
 	public Employee getCurrentEmployee() {
 		return _currentEmployee;
+	}
+	
+	public void setCurrentEmployee(Employee currentEmployee) {
+	  _currentEmployee = currentEmployee;
 	}
 	
 	public Stage getScheduleStage() {

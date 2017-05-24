@@ -1,8 +1,11 @@
-package comp110;
+package ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import comp110.Controller;
+import comp110.Employee;
+import comp110.Week;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -40,8 +43,8 @@ public class PerformSwapStage extends KarenStage {
 	private int _addHour;
 	private Employee _employeeToAddOrDrop;
 
-	public PerformSwapStage(String title, Controller controller, Employee currentEmployee, UI ui) {
-		super(title, controller, currentEmployee, ui);
+	public PerformSwapStage(String title, Controller controller, UI ui) {
+		super(title, controller, ui);
 		_continueToSwap = false;
 		Group root = new Group();
 		TabPane rootTabPane = new TabPane();
@@ -56,8 +59,8 @@ public class PerformSwapStage extends KarenStage {
 		Button saveButton = new Button("Swap!");
 		_topBox = new SwapBox(_ui);
 		_bottomBox = new SwapBox(_ui);
-		_topBox.registerSwapListener(saveButton, _bottomBox.getSwapEmployee());
-		_bottomBox.registerSwapListener(saveButton, _topBox.getSwapEmployee());
+		_topBox.registerSwapListener(saveButton, _bottomBox);
+		_bottomBox.registerSwapListener(saveButton, _topBox);
 		// disable save button by default
 		saveButton.setDisable(true);
 		// TODO figure out how to not hardcode this and just make it fill stage
@@ -128,7 +131,7 @@ public class PerformSwapStage extends KarenStage {
 		// they are swapping into
 		_continueToSwap = true;
 		if (unavailableEmployee != null) {
-			KarenStage dialogueBox = new KarenStage("Unavailable Employee", null, null, _ui);
+			KarenStage dialogueBox = new KarenStage("Unavailable Employee", null, _ui);
 			Group root = new Group();
 			Scene scene = new Scene(root);
 
@@ -232,7 +235,7 @@ public class PerformSwapStage extends KarenStage {
 				List<Label> scheduledEmployees = new ArrayList<Label>();
 				for (Employee e : _ui.getSchedule().getWeek().getShift(_dropDay, _dropHour)) {
 					Label toAdd = new Label(e.getName());
-					if (_currentEmployee != null && toAdd.getText().equals(_currentEmployee.getName())) {
+					if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 						toAdd.setTextFill(Color.RED);
 					}
 					scheduledEmployees.add(toAdd);
@@ -275,7 +278,7 @@ public class PerformSwapStage extends KarenStage {
 			List<Label> allEmployees = new ArrayList<Label>();
 			for (Employee e : _ui.getSchedule().getStaff()) {
 				Label toAdd = new Label(e.getName());
-				if (_currentEmployee != null && toAdd.getText().equals(_currentEmployee.getName())) {
+				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
 				}
 				allEmployees.add(toAdd);

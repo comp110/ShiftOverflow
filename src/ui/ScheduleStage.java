@@ -1,7 +1,11 @@
-package comp110;
+package ui;
 
 import java.util.ArrayList;
 
+import comp110.Controller;
+import comp110.Employee;
+import comp110.Schedule;
+import comp110.Week;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -11,8 +15,8 @@ import javafx.scene.paint.Color;
 
 public class ScheduleStage extends KarenStage {
 	
-	public ScheduleStage(Schedule schedule, String title, Employee currentEmployee, Controller controller, UI ui) {
-		super(title, controller, currentEmployee, ui);
+	public ScheduleStage(Schedule schedule, String title, Controller controller, UI ui) {
+		super(title, controller, ui);
 		this.setOnCloseRequest((event) -> {
 			_ui.setScheduleStageIsOpen(false);
 			this.close();
@@ -72,8 +76,8 @@ public class ScheduleStage extends KarenStage {
 					if (i < shifts.get(day).get(hour).size()) {
 						Label scheduledEmployee = new Label(shifts.get(day).get(hour).get(i).toString());
 						// highlight your name on the schedule
-						if ((this._currentEmployee != null)
-								&& (shifts.get(day).get(hour).get(i).toString().equals(_currentEmployee.getName()))) {
+						if ((_ui.getCurrentEmployee() != null)
+								&& (shifts.get(day).get(hour).get(i).toString().equals(_ui.getCurrentEmployee().getName()))) {
 							scheduledEmployee.setTextFill(Color.RED);
 						}
 						// +1 to account for day row

@@ -1,7 +1,10 @@
-package comp110;
+package ui;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import comp110.Employee;
+import comp110.Week;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -65,10 +68,12 @@ public class SwapBox extends HBox {
 
 	// needs to be called on each swapBox so that they can talk to each other
 	// and coordinate swapping
-	public void registerSwapListener(Button saveButton, Employee otherToSwap) {
+	public void registerSwapListener(Button saveButton, SwapBox otherBox) {
 		_personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_swapEmployee = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
-			if (_swapEmployee != null && otherToSwap != null) {
+      System.out.println(_swapEmployee);
+      System.out.println(otherBox.getSwapEmployee());
+			if (_swapEmployee != null && otherBox.getSwapEmployee() != null) {
 				saveButton.setDisable(false);
 			}
 		});

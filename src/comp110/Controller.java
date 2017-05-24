@@ -1,6 +1,7 @@
 package comp110;
 
 import javafx.application.Platform;
+import ui.UI;
 
 public class Controller implements Storage.StorageListener {
 

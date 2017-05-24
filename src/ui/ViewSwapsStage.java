@@ -1,5 +1,6 @@
-package comp110;
+package ui;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,6 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import comp110.Controller;
+import comp110.Employee;
+import comp110.Schedule;
+import comp110.Shift;
+import comp110.Week;
 import javafx.collections.FXCollections;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -16,8 +23,8 @@ import javafx.scene.layout.HBox;
 
 public class ViewSwapsStage extends KarenStage {
 
-	public ViewSwapsStage(String title, Employee currentEmployee, Controller controller, UI ui) {
-		super(title, controller, currentEmployee, ui);
+	public ViewSwapsStage(String title, Controller controller, UI ui) {
+		super(title, controller, ui);
 		this.renderSwapStage();
 		this.show();
 	}
@@ -68,7 +75,7 @@ public class ViewSwapsStage extends KarenStage {
 		ArrayList<String> swapCandidates = new ArrayList<String>();
 		swapCandidates.addAll(schedule.getStaff().getWhoIsAvailable(day, hour));
 		// remove yourself from the list
-		swapCandidates.remove(_currentEmployee.getName());
+		swapCandidates.remove(_ui.getCurrentEmployee().getName());
 		// now score each one
 		Map<Employee, Double> scoredEmployees = new HashMap<Employee, Double>();
 		for (String otherEmployeeName : swapCandidates) {
@@ -93,7 +100,7 @@ public class ViewSwapsStage extends KarenStage {
 			// now see which shifts of other employee currentEmployee is
 			// available for
 			for (Shift shift : scheduledShifts) {
-				if (_currentEmployee.isAvailable(shift.getDay(), shift.getHour())) {
+				if (_ui.getCurrentEmployee().isAvailable(shift.getDay(), shift.getHour())) {
 					scoredEmployees.put(otherEmployee, scoredEmployees.get(otherEmployee) + 1);
 				}
 			}
@@ -107,7 +114,8 @@ public class ViewSwapsStage extends KarenStage {
 		for (Employee e : scoredEmployees.keySet()) {
 			// only write out employees we have the potential to swap with
 			if (scoredEmployees.get(e) > 0) {
-				orderedSwapCandidates.add(e.getName() + " " + scoredEmployees.get(e));
+			  // https://stackoverflow.com/questions/17060285/java-double-how-to-always-show-two-decimal-digits
+				orderedSwapCandidates.add(e.getName() + " " + new DecimalFormat("#0.00").format(scoredEmployees.get(e)));
 			}
 		}
 
@@ -115,13 +123,13 @@ public class ViewSwapsStage extends KarenStage {
 	}
 
 	// returns strings in the proper label format of all the shifts
-	// _currentEmployee is scheduled for
+	// _ui.getCurrentEmployee() is scheduled for
 	private ArrayList<String> getScheduledShifts(Schedule schedule) {
 		ArrayList<String> scheduledShifts = new ArrayList<String>();
 		for (int day = 0; day < schedule.getWeek().getShifts().length; day++) {
 			for (int hour = 0; hour < schedule.getWeek().getShifts()[day].length; hour++) {
 				for (Employee e : schedule.getWeek().getShift(day, hour)) {
-					if (_currentEmployee != null && e.getName().equals(_currentEmployee.getName())) {
+					if (_ui.getCurrentEmployee() != null && e.getName().equals(_ui.getCurrentEmployee().getName())) {
 						scheduledShifts.add(Week.dayString(day) + " " + (hour % 12 == 0 ? 12 : hour % 12) + " -- "
 								+ ((hour + 1) % 12 == 0 ? 12 : (hour + 1) % 12));
 					}
