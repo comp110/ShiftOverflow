@@ -1,6 +1,6 @@
-# TAScheduler
+# ShiftOverflow
 
-TAScheduler is a JavaFX application used to schedule Office Hours for TA's
+ShiftOverflow is a JavaFX application used to for all COMP110 related office hours scheduling
 
 ## Installation
 
