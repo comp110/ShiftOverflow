@@ -26,6 +26,13 @@ public class ScheduleStage extends KarenStage {
 		this.show();
 	}
 	
+	// called whenever we refresh an open schedule stage, we want to set same x and y as previously
+	 public ScheduleStage(Schedule schedule, String title, Controller controller, UI ui, double x, double y) {
+	   this(schedule, title, controller, ui);
+	   this.setX(x);
+	   this.setY(y);
+	 }
+	
 	private void renderScheduleStage(Schedule schedule) {
 		_ui.setScheduleStageIsOpen(true);
 		if (_ui.getSchedule() == null) {

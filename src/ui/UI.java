@@ -101,13 +101,14 @@ public class UI extends Application {
 		_passwordSubmitButton.setDisable(true);
 	}
 	
-	public void refreshSchedule(Schedule schedule) {
-		//close the current stage
+	public void refreshSchedule() {
+		// get the current x and y
+	  double x = _scheduleStage.getX();
+	  double y = _scheduleStage.getY(); 
+	  //close the current stage
 		_scheduleStage.close();
-		//update the schedule
-		_schedule = schedule;
 		//open a new one with the refreshed schedule
-		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _controller, this);
+		_scheduleStage = new ScheduleStage(_schedule, "Current Schedule", _controller, this, x, y);
 	}
 
   // called from the controller when an Employee object is ready for
@@ -118,7 +119,7 @@ public class UI extends Application {
 	  if (_availabilityStage != null){
 	    _availabilityStage.close();
 	  }
-		_availabilityStage = new AvailabilityStage("COMP110 TA Availability", _controller, this);
+		_availabilityStage = new AvailabilityStage("ShiftOverflow", _controller, this);
 		_availabilityStage.show();
 	}
 
@@ -295,6 +296,10 @@ public class UI extends Application {
 		if (success == true) {
 			// save was successful
 			this.displayMessage("Save complete", false);
+			//update the schedule stage if open
+		   if (_scheduleStageIsOpen) {
+		      this.refreshSchedule();
+		    }
 		} else {
 			// push failed
 			this.displayMessage("Unable to push files to github. " + message);

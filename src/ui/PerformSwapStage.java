@@ -197,10 +197,6 @@ public class PerformSwapStage extends KarenStage {
 		_ui.getSchedule().getWeek().getShift(swapDay1, swapHour1).add(swapEmployee2);
 		_ui.getSchedule().getWeek().getShift(swapDay2, swapHour2).add(swapEmployee1);
 
-		// if schedule is open we need to refresh the view
-		if (_ui.getScheduleStageIsOpen()) {
-			_ui.refreshSchedule(_ui.getSchedule());
-		}
 		// tell controller to push changes
 		_controller.uiRequestChangeSchedule(_ui.getSchedule(), "SWAPPED: " + swapEmployee1.getName() + " "
 				+ Week.dayString(swapDay1) + " " + ((swapHour1 % 12) == 0 ? 12 : (swapHour1 % 12)) + " -- "
@@ -300,10 +296,6 @@ public class PerformSwapStage extends KarenStage {
 		} else { // must be a drop
 			_ui.getSchedule().getWeek().getShift(_dropDay, _dropHour).remove(_employeeToAddOrDrop);
 
-		}
-		// if schedule is open we need to refresh the view
-		if (_ui.getScheduleStageIsOpen()) {
-			_ui.refreshSchedule(_ui.getSchedule());
 		}
 		// tell controller to push changes
 		if (_addOrDrop.equals("Add")) {
