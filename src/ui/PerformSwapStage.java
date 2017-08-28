@@ -130,7 +130,7 @@ public class PerformSwapStage extends KarenStage {
 		// show a warning that one of the employees is unavailable for the shift
 		// they are swapping into
 		_continueToSwap = true;
-		if (unavailableEmployee != null) {
+		if (unavailableEmployee != "") {
 			KarenStage dialogueBox = new KarenStage("Unavailable Employee", null, _ui);
 			Group root = new Group();
 			Scene scene = new Scene(root);
@@ -167,6 +167,12 @@ public class PerformSwapStage extends KarenStage {
 				dialogueBox.close();
 			});
 			Button no = new Button("No");
+			dialogueBox.setOnCloseRequest((event1) -> {
+				//assume hitting the close window button is like clicking no
+				// if not set the flag so we don't swap
+				_continueToSwap = false;
+				dialogueBox.close();
+			});
 			no.setOnAction((event1) -> {
 				// if not set the flag so we don't swap
 				_continueToSwap = false;

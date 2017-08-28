@@ -119,7 +119,7 @@ public class UI extends Application {
 	  if (_availabilityStage != null){
 	    _availabilityStage.close();
 	  }
-		_availabilityStage = new AvailabilityStage("ShiftOverflow v0.2.0", _controller, this);
+		_availabilityStage = new AvailabilityStage("ShiftOverflow v0.2.1", _controller, this);
 		_availabilityStage.show();
 	}
 

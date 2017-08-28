@@ -319,7 +319,7 @@ public class AvailabilityStage extends KarenStage {
     // need to send to controller to save the current modified Employee
     // object
     // disable the save button so they can't save again until they make
-    // another chang
+    // another change
     _saveAvailabilityButton.setDisable(true);
     if (_ui.getCurrentEmployee() != null) {
       _controller.uiRequestSaveAvailability(_ui.getCurrentEmployee(),
