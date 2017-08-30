@@ -84,17 +84,25 @@ public class PerformSwapStage extends KarenStage {
 		_addOrDropComboBox.getSelectionModel().selectFirst(); // set Drop as
 																// default
 		_addOrDrop = "Drop";
+		
+		// because default is drop set initial text to be that
+		_addOrDropButton = new Button("Drop");
+		_addOrDropButton.setPrefWidth(744);
+		_addOrDropButton.setOnAction(this::addDropButtonPress);
+		
 		_addOrDropComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addOrDrop = newValue;
 			if (_addOrDrop.equals("Add")) {
 				_addOrDropPane.getChildren().clear();
 				_addOrDropPane.setTop(_addOrDropComboBox);
 				_addOrDropPane.setBottom(_addOrDropButton);
+				_addOrDropButton.setText("Add");
 				setupForAdd();
 			} else {
 				_addOrDropPane.getChildren().clear();
 				_addOrDropPane.setTop(_addOrDropComboBox);
 				_addOrDropPane.setBottom(_addOrDropButton);
+				_addOrDropButton.setText("Drop");
 				setupForDrop();
 			}
 		});
@@ -102,9 +110,6 @@ public class PerformSwapStage extends KarenStage {
 
 		this.setupForDrop(); // first time through we want to setup for drop
 
-		_addOrDropButton = new Button("Save");
-		_addOrDropButton.setPrefWidth(744);
-		_addOrDropButton.setOnAction(this::addDropButtonPress);
 		_addOrDropPane.setBottom(_addOrDropButton);
 		return _addOrDropPane;
 	}
