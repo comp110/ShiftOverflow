@@ -84,12 +84,13 @@ public class PerformSwapStage extends KarenStage {
 		_addOrDropComboBox.getSelectionModel().selectFirst(); // set Drop as
 																// default
 		_addOrDrop = "Drop";
-		
+
 		// because default is drop set initial text to be that
 		_addOrDropButton = new Button("Drop");
+		_addOrDropButton.setDisable(true);
 		_addOrDropButton.setPrefWidth(744);
 		_addOrDropButton.setOnAction(this::addDropButtonPress);
-		
+
 		_addOrDropComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addOrDrop = newValue;
 			if (_addOrDrop.equals("Add")) {
@@ -173,7 +174,7 @@ public class PerformSwapStage extends KarenStage {
 			});
 			Button no = new Button("No");
 			dialogueBox.setOnCloseRequest((event1) -> {
-				//assume hitting the close window button is like clicking no
+				// assume hitting the close window button is like clicking no
 				// if not set the flag so we don't swap
 				_continueToSwap = false;
 				dialogueBox.close();
@@ -217,6 +218,7 @@ public class PerformSwapStage extends KarenStage {
 	}
 
 	private void setupForDrop() {
+		_addOrDropButton.setDisable(true);
 
 		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
 		ListView<String> dayListView = new ListView<String>(dayList);
@@ -228,51 +230,55 @@ public class PerformSwapStage extends KarenStage {
 			javafx.collections.ObservableList<String> hours = FXCollections
 					.observableArrayList(_ui.getHoursList(newValue));
 			hourListView.setItems(hours);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
 		});
 
 		ListView<Label> personListView = new ListView<Label>();
 		_addOrDropPane.setRight(personListView);
-		hourListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				_dropHour = Integer.parseInt(newValue.split(" ")[0]);
-				if (_dropHour < 9) {
-					_dropHour += 12;
-				}
-				List<Label> scheduledEmployees = new ArrayList<Label>();
-				for (Employee e : _ui.getSchedule().getWeek().getShift(_dropDay, _dropHour)) {
-					Label toAdd = new Label(e.getName());
-					if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
-						toAdd.setTextFill(Color.RED);
-					}
-					scheduledEmployees.add(toAdd);
-				}
-				javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(scheduledEmployees);
-				personListView.setItems(people);
+		hourListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_dropHour = Integer.parseInt(newValue.split(" ")[0]);
+			if (_dropHour < 9) {
+				_dropHour += 12;
 			}
+			List<Label> scheduledEmployees = new ArrayList<Label>();
+			for (Employee e : _ui.getSchedule().getWeek().getShift(_dropDay, _dropHour)) {
+				Label toAdd = new Label(e.getName());
+				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
+					toAdd.setTextFill(Color.RED);
+				}
+				scheduledEmployees.add(toAdd);
+			}
+			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(scheduledEmployees);
+			personListView.setItems(people);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
 		});
-		personListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Label>() {
-			@Override
-			public void changed(ObservableValue<? extends Label> observable, Label oldValue, Label newValue) {
-				_employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+			if (_employeeToAddOrDrop == null) {
+				_addOrDropButton.setDisable(true);
+			} else {
+				_addOrDropButton.setDisable(false);
 			}
 		});
 	}
 
 	private void setupForAdd() {
+		_addOrDropButton.setDisable(true);
+
 		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
 		ListView<String> dayListView = new ListView<String>(dayList);
 		_addOrDropPane.setLeft(dayListView);
 		ListView<String> hourListView = new ListView<String>();
 		_addOrDropPane.setCenter(hourListView);
-		dayListView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				_addDay = Week.dayInt(newValue);
-				javafx.collections.ObservableList<String> hours = FXCollections
-						.observableArrayList(_ui.getHoursList(newValue));
-				hourListView.setItems(hours);
-			}
+		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_addDay = Week.dayInt(newValue);
+			javafx.collections.ObservableList<String> hours = FXCollections
+					.observableArrayList(_ui.getHoursList(newValue));
+			hourListView.setItems(hours);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
 		});
 
 		ListView<Label> personListView = new ListView<Label>();
@@ -292,9 +298,17 @@ public class PerformSwapStage extends KarenStage {
 			}
 			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(allEmployees);
 			personListView.setItems(people);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
 		});
-		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue,
-				newValue) -> _employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText())
+		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+			if (_employeeToAddOrDrop == null) {
+				_addOrDropButton.setDisable(true);
+			} else {
+				_addOrDropButton.setDisable(false);
+			}
+		}
 
 		);
 
