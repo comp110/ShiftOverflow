@@ -95,7 +95,7 @@ public class UI extends Application {
 	private void loginToGithub(ActionEvent event) {
 		// user has entered the username and password for github
 		// send that info to the controller so it can pull the files
-		_controller.uiUsernamePasswordCallback(new Credentials(_usernameField.getText(), _passwordField.getText()));
+		_controller.uiUsernamePasswordCallback(_usernameField.getText(), _passwordField.getText());
 
 		// disable the password submit button until pull is done
 		_passwordSubmitButton.setDisable(true);
