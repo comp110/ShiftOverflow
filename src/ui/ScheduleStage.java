@@ -12,6 +12,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 
 public class ScheduleStage extends KarenStage {
 	
@@ -81,18 +86,21 @@ public class ScheduleStage extends KarenStage {
 			for (int i = 0; i < max; i++) {
 				for (int day = 0; day < 7; day++) {
 					if (i < shifts.get(day).get(hour).size()) {
-						Label scheduledEmployee = new Label(shifts.get(day).get(hour).get(i).toString());
+						Text scheduledEmployee = new Text(shifts.get(day).get(hour).get(i).toString());
+						scheduledEmployee.setFont(Font.font("SansSerif", FontWeight.NORMAL, 12));
+
 						//bold shift lead
 						if (_ui.getCurrentEmployee() != null && schedule.getWeek().getShift(day, hour).getLead() != null && shifts.get(day).get(hour).get(i).equals(schedule.getWeek().getShift(day, hour).getLead())) {
-							scheduledEmployee.setStyle("-fx-font-weight: bold");
+							scheduledEmployee.setFont(Font.font("SansSerif", FontWeight.BOLD, 12));
+							//scheduledEmployee.setFont(Font.getDefault());
 						}
 						// highlight your name on the schedule
 						if ((_ui.getCurrentEmployee() != null)
 								&& (shifts.get(day).get(hour).get(i).toString().equals(_ui.getCurrentEmployee().getName()))) {
-							scheduledEmployee.setTextFill(Color.RED);
+							scheduledEmployee.setFill(Color.RED);
 						}
 						// +1 to account for day row
-						schedulePane.add(scheduledEmployee, day + 1, hourRow + i + 1);
+						schedulePane.add(new TextFlow(scheduledEmployee), day + 1, hourRow + i + 1);
 					}
 				}
 			}
