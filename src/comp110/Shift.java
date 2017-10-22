@@ -15,6 +15,7 @@ public class Shift extends HashSet<Employee> implements Serializable {
 	private int m_day;
 	private int m_hour;
 	private int m_capacity;
+	private Employee m_lead;
 
 	
 	// functions
@@ -22,6 +23,7 @@ public class Shift extends HashSet<Employee> implements Serializable {
 		this.m_day = day;
 		this.m_hour = hour;
 		this.m_capacity = capacity;
+		this.m_lead = null;
 	}
 
 	public boolean add(Employee e) {
@@ -118,6 +120,14 @@ public class Shift extends HashSet<Employee> implements Serializable {
 
 	public int getCapacityRemaining() {
 		return this.m_capacity - size();
+	}
+	
+	public void setLead(Employee e) {
+		m_lead = e;
+	}
+	
+	public Employee getLead() {
+		return m_lead;
 	}
 
 	public Shift copy() {

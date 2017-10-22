@@ -77,4 +77,13 @@ public class Staff extends HashSet<Employee> implements Serializable {
 		}
 		return null;
 	}
+	
+	public Employee getEmployeeByOnyen(String onyen) {
+		for (Employee e : this) {
+			if (e.getOnyen().equals(onyen)) {
+				return e;
+			}
+		}
+		return null;
+	}
 }

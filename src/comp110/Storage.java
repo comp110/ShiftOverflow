@@ -66,6 +66,10 @@ public class Storage {
     public String get_schedule_json_filename(){
         return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/schedule.json";
     }
+    
+    public String get_schedule_leads_filename(){
+        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/leads.csv";
+    }
 
     public String get_path_to_onyen_csv_directory(){
         return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/fall-17/staff/";

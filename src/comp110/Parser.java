@@ -79,7 +79,7 @@ public class Parser {
 		return new Employee(name, onyen, capacity, gender.equals("M") ? false : true, level, availability);
 	}
 
-	public Schedule parseSchedule(String jsonFile, String staff_dir) throws Exception {
+	public Schedule parseSchedule(String jsonFile, String staff_dir, String leadsFile) throws Exception {
 
 		// read in the json file
 		Gson gson = new Gson();
@@ -134,9 +134,10 @@ public class Parser {
 				}
 			}
 		}
-		return new Schedule(staff, week);
+		Leads leads = this.parseLeads(leadsFile, staff);
+		return new Schedule(staff, week, leads);
 	}
-
+	
 	public void writeFile(Employee employee, String filename) throws Exception{
 
 		// check if employee is null first
@@ -234,6 +235,27 @@ public class Parser {
 		}
 		// not able to find employee
 		return null;
+	}
+	
+	private Leads parseLeads(String leadsFile, Staff staff) throws Exception {
+		BufferedReader reader = null;
+		Leads leads = new Leads(staff);
+		try {
+			File file = new File(leadsFile);
+			reader = new BufferedReader(new FileReader((file)));
+			while (reader.ready()) {
+				leads.add(reader.readLine().split(",")[0]);
+			}
+			reader.close();
+		} catch (FileNotFoundException e) {
+			throw new Exception("Parser::parseSchedule(): Error reading leads file=" + leadsFile);
+		}
+
+		if (leads.size() == 0) {
+			throw new Exception("Parser::parseSchedule(): Error parsing leads file to Leads object. File=" + leadsFile);
+		}
+
+		return leads;
 	}
 
 	public void writeScheduleToJson(Schedule schedule, String path) throws Exception{

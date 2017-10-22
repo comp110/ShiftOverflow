@@ -82,6 +82,10 @@ public class ScheduleStage extends KarenStage {
 				for (int day = 0; day < 7; day++) {
 					if (i < shifts.get(day).get(hour).size()) {
 						Label scheduledEmployee = new Label(shifts.get(day).get(hour).get(i).toString());
+						//bold shift lead
+						if (_ui.getCurrentEmployee() != null && schedule.getWeek().getShift(day, hour).getLead() != null && shifts.get(day).get(hour).get(i).equals(schedule.getWeek().getShift(day, hour).getLead())) {
+							scheduledEmployee.setStyle("-fx-font-weight: bold");
+						}
 						// highlight your name on the schedule
 						if ((_ui.getCurrentEmployee() != null)
 								&& (shifts.get(day).get(hour).get(i).toString().equals(_ui.getCurrentEmployee().getName()))) {

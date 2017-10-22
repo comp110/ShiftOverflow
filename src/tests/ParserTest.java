@@ -40,7 +40,7 @@ public class ParserTest {
 	public void parseSchedule_test() {
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedule("testData/schedule.json", "data/spring-17/staff");
+			Schedule s = p.parseSchedule("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			Shift test1 = new Shift(0, 1, 0);
 			Shift test2 = new Shift(0, 2, 0);
 			Shift test3 = new Shift(1, 5, 0); 
@@ -131,9 +131,9 @@ public class ParserTest {
 	public void writeScheduleToJson_Test() {
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedule("testData/schedule.json", "data/spring-17/staff");
+			Schedule s = p.parseSchedule("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			p.writeScheduleToJson(s, "testData/testSchedule.json");
-			Schedule result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff");
+			Schedule result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			assertEquals(s.equals(result), true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -170,12 +170,12 @@ public class ParserTest {
 	public void writeRepeatedSchedules(){
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff");
+			Schedule s = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			p.writeScheduleToJson(s, "testData/testSchedule.json");
-			Schedule result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff");
+			Schedule result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			for(int i = 0; i < 20; i++){
 				p.writeScheduleToJson(result, "testData/testSchedule.json");
-				result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff");
+				result = p.parseSchedule("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			}
 			assertEquals(s.equals(result), true);
 		} catch (Exception e) {

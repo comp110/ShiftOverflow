@@ -36,7 +36,7 @@ public class Controller implements Storage.StorageListener {
 		
 		// go ahead and give them the schedule immediately for use
 		try{
-			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(), this.m_storage.get_path_to_onyen_csv_directory());
+			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(), this.m_storage.get_path_to_onyen_csv_directory(), this.m_storage.get_schedule_leads_filename());
 			this.m_ui.setSchedule(schedule);
 		} catch (Exception e){
 			// tell the ui things suck
@@ -54,7 +54,7 @@ public class Controller implements Storage.StorageListener {
 		// tell the ui to show the schedule...this can/will be null if there was an exception
 		// ui needs to be ready to handle null schedule
 		try{
-			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(), this.m_storage.get_path_to_onyen_csv_directory());
+			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(), this.m_storage.get_path_to_onyen_csv_directory(), this.m_storage.get_schedule_leads_filename());
 			this.m_ui.setSchedule(schedule);
 			Platform.runLater(() -> this.m_ui.displaySchedule(schedule));
 		} catch (Exception e){
