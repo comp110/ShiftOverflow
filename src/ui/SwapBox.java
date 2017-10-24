@@ -71,8 +71,7 @@ public class SwapBox extends HBox {
 	public void registerSwapListener(Button saveButton, SwapBox otherBox) {
 		_personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_swapEmployee = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
-      System.out.println(_swapEmployee);
-      System.out.println(otherBox.getSwapEmployee());
+
 			if (_swapEmployee != null && otherBox.getSwapEmployee() != null) {
 				saveButton.setDisable(false);
 			}

@@ -46,15 +46,8 @@ public class Schedule implements Serializable {
 			for (int hour = 0; hour < m_week.getShifts()[day].length; hour++) {
 				Employee lead = null;
 				int leadRank = Integer.MAX_VALUE; //we want to find min
-				System.out.println("Day: " + day + " Hour: " + hour);
 				for (Employee e : m_week.getShift(day, hour)) {
 					int rank = m_leads.getRank(e);
-					if (e.getOnyen().equals("youngjt")) {
-						System.out.println("Jeffrey rank: " + rank);
-					}
-					if (e.getOnyen().equals("dunnac11")) {
-						System.out.println("Duncan rank: " + rank);
-					}
 					if (rank < leadRank) { //if this employee is a potential lead
 						// found a new min
 						lead = e;
@@ -63,7 +56,6 @@ public class Schedule implements Serializable {
 				}
 				if (lead != null) {
 					m_week.getShift(day, hour).setLead(lead);
-					System.out.println("Lead: " + lead.getOnyen());
 				}
 			}
 		}

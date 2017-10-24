@@ -74,9 +74,9 @@ public class ScheduleStage extends KarenStage {
 		}
 
 		//Load the fonts
-		InputStream is = ScheduleStage.class.getResourceAsStream("segoeui.ttf");
+		InputStream is = getClass().getResourceAsStream("segoeui.ttf");
         Font font = Font.loadFont(is, 12.0);   
-		InputStream is2 = ScheduleStage.class.getResourceAsStream("segoeuibold.ttf");
+		InputStream is2 = getClass().getResourceAsStream("segoeuibold.ttf");
         Font boldFont = Font.loadFont(is2, 12.0);
 		
 		
@@ -98,7 +98,7 @@ public class ScheduleStage extends KarenStage {
 						scheduledEmployee.setFont(font);
 
 						//bold shift lead
-						if (_ui.getCurrentEmployee() != null && schedule.getWeek().getShift(day, hour).getLead() != null && shifts.get(day).get(hour).get(i).equals(schedule.getWeek().getShift(day, hour).getLead())) {
+						if (schedule.getWeek().getShift(day, hour).getLead() != null && shifts.get(day).get(hour).get(i).equals(schedule.getWeek().getShift(day, hour).getLead())) {
 							scheduledEmployee.setFont(boldFont);
 							//scheduledEmployee.setFont(Font.getDefault());
 						}
