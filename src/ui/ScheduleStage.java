@@ -1,5 +1,6 @@
 package ui;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import comp110.Controller;
@@ -72,6 +73,13 @@ public class ScheduleStage extends KarenStage {
 			schedulePane.add(new Label(Week.dayString(day)), day + 1, 0);
 		}
 
+		//Load the fonts
+		InputStream is = ScheduleStage.class.getResourceAsStream("segoeui.ttf");
+        Font font = Font.loadFont(is, 12.0);   
+		InputStream is2 = ScheduleStage.class.getResourceAsStream("segoeuibold.ttf");
+        Font boldFont = Font.loadFont(is2, 12.0);
+		
+		
 		int hourRow = 0;
 		for (int hour = getEarliestHour(schedule.getWeek()); hour < getLatestHour(schedule.getWeek()); hour++) {
 			Label dayLabel = new Label(
@@ -87,11 +95,11 @@ public class ScheduleStage extends KarenStage {
 				for (int day = 0; day < 7; day++) {
 					if (i < shifts.get(day).get(hour).size()) {
 						Text scheduledEmployee = new Text(shifts.get(day).get(hour).get(i).toString());
-						scheduledEmployee.setFont(Font.font("SansSerif", FontWeight.NORMAL, 12));
+						scheduledEmployee.setFont(font);
 
 						//bold shift lead
 						if (_ui.getCurrentEmployee() != null && schedule.getWeek().getShift(day, hour).getLead() != null && shifts.get(day).get(hour).get(i).equals(schedule.getWeek().getShift(day, hour).getLead())) {
-							scheduledEmployee.setFont(Font.font("SansSerif", FontWeight.BOLD, 12));
+							scheduledEmployee.setFont(boldFont);
 							//scheduledEmployee.setFont(Font.getDefault());
 						}
 						// highlight your name on the schedule
