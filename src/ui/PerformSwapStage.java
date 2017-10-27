@@ -1,6 +1,7 @@
 package ui;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import comp110.Controller;
@@ -17,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -296,6 +298,28 @@ public class PerformSwapStage extends KarenStage {
 				}
 				allEmployees.add(toAdd);
 			}
+			Collections.sort(allEmployees, (a, b) -> {
+				// need to do this because I don't want to add my last name lol
+				String aName = "";
+				String bName = "";
+				if (((Label) a).getText().equals("Jeffrey")) {
+					aName = "Jeffrey Young";
+				} else {
+					aName = ((Label) a).getText();
+				}
+				if (((Label) b).getText().equals("Jeffrey")) {
+					bName = "Jeffrey Young";
+				} else {
+					bName = ((Label) b).getText();
+				}
+				if (aName.split(" ")[1].compareTo(bName.split(" ")[1]) >= 1) {
+					return 1;
+				} else if (aName.split(" ")[1].compareTo(bName.split(" ")[1]) <= -1) {
+					return -1;
+				} else {
+					return 0;
+				}
+			});
 			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(allEmployees);
 			personListView.setItems(people);
 			_employeeToAddOrDrop = null;
