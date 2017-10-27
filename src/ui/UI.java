@@ -34,6 +34,8 @@ public class UI extends Application {
 	private boolean _scheduleStageIsOpen;
 	private ScheduleStage _scheduleStage;
 	private ViewSwapsStage _viewSwapsStage; 
+	
+	private static final String VERSION = "0.3.1";
 
 
 	@Override
@@ -119,7 +121,7 @@ public class UI extends Application {
 	  if (_availabilityStage != null){
 	    _availabilityStage.close();
 	  }
-		_availabilityStage = new AvailabilityStage("ShiftOverflow v0.3.1", _controller, this);
+		_availabilityStage = new AvailabilityStage("ShiftOverflow v" + VERSION, _controller, this);
 		_availabilityStage.show();
 	}
 
@@ -274,6 +276,16 @@ public class UI extends Application {
 			hoursList.add(((i % 12) == 0 ? 12 : (i % 12)) + " -- " + (((i + 1) % 12) == 0 ? 12 : ((i + 1) % 12)));
 		}
 		return hoursList;
+	}
+	
+	public void checkVersion(String currentVersion) {
+		if (currentVersion.equals("")) { //if we couldn't find version file just don't worry about it
+			return;
+		}
+		if (currentVersion != UI.VERSION) {
+			// tell user they need to update
+			displayMessage("You are not using the current version of ShiftOverflow. The current version is v" + currentVersion + ". Please close and update by visiting\ngithub.com/comp110/ShiftOverflow/releases/tag/v" + currentVersion + " before continuing.", false);
+		}
 	}
 
 	public void githubPullResult(boolean success, String message) {

@@ -278,4 +278,22 @@ public class Parser {
 			throw new Exception("Parser::writeScheduleToJson(): Unable to open file=" + path);
 		}
 	}
+	
+	public String parseCurrentVersion(String versionPath) {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(versionPath));
+		} catch (FileNotFoundException e) {
+			return ""; //if we can't find the file just carry on
+		}
+		String currentVersion = null;
+		try {
+			currentVersion = reader.readLine();
+			reader.close();
+		} catch (IOException e) { //This should never happen 
+			System.err.println("lol this should never happen");
+			e.printStackTrace();
+		}
+		return currentVersion;
+	}
 }
