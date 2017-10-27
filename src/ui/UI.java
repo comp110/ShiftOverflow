@@ -67,6 +67,11 @@ public class UI extends Application {
 		_usernameField = new TextField();
 		_passwordField = new PasswordField();
 		// bind enter key to button press
+		_usernameField.setOnKeyPressed((event) -> {
+			if (event.getCode() == KeyCode.ENTER) {
+				this.loginToGithub(null);
+			}
+		});
 		_passwordField.setOnKeyPressed((event) -> {
 			if (event.getCode() == KeyCode.ENTER) {
 				this.loginToGithub(null);
@@ -121,7 +126,7 @@ public class UI extends Application {
 	  if (_availabilityStage != null){
 	    _availabilityStage.close();
 	  }
-		_availabilityStage = new AvailabilityStage("ShiftOverflow v" + VERSION, _controller, this);
+		_availabilityStage = new AvailabilityStage("ShiftOverflow v" + UI.VERSION, _controller, this);
 		_availabilityStage.show();
 	}
 
