@@ -69,7 +69,9 @@ public class AvailabilityStage extends KarenStage {
       _onyenField = new TextField(_ui.getCurrentEmployee().getOnyen());
     } else {
       _onyenField = new TextField("Enter onyen here");
-      _onyenField.setOnKeyPressed((event) -> {
+    }
+    
+    _onyenField.setOnKeyPressed((event) -> {
         if (event.getCode() == KeyCode.ENTER) {
           getAvailability(null);
         }
@@ -82,7 +84,7 @@ public class AvailabilityStage extends KarenStage {
           Platform.runLater(() -> AvailabilityStage.this._onyenField.selectAll());
         }
       });
-    }
+    
     topBar.getChildren().add(_onyenField);
     topBox.getChildren().add(topBar);
 
