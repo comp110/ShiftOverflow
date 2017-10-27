@@ -2,6 +2,7 @@ package ui;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import comp110.Controller;
 import comp110.Employee;
@@ -11,6 +12,9 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -21,43 +25,54 @@ import javafx.scene.text.TextFlow;
 
 public class ScheduleStage extends KarenStage {
 	
-	public ScheduleStage(Schedule schedule, String title, Controller controller, UI ui) {
+	public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui) {
 		super(title, controller, ui);
 		this.setOnCloseRequest((event) -> {
 			_ui.setScheduleStageIsOpen(false);
 			this.close();
 		}
 	);
-		renderScheduleStage(schedule);
+		renderScheduleStage(schedules);
 		this.show();
 	}
 	
 	// called whenever we refresh an open schedule stage, we want to set same x and y as previously
-	 public ScheduleStage(Schedule schedule, String title, Controller controller, UI ui, double x, double y) {
-	   this(schedule, title, controller, ui);
+	 public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui, double x, double y) {
+	   this(schedules, title, controller, ui);
 	   this.setX(x);
 	   this.setY(y);
 	 }
 	
-	private void renderScheduleStage(Schedule schedule) {
+	private void renderScheduleStage(List<Schedule> schedules) {
 		_ui.setScheduleStageIsOpen(true);
-		if (_ui.getSchedule() == null) {
+		if (_ui.getSchedules() == null) {
 			// only want to do this first time we get the schedule, otherwise UI
 			// has most up to date
 			// version of schedule and controller version is out of date
-			_ui.setSchedule(schedule);
+			_ui.setSchedules(schedules);
 
 		}
+		
+		TabPane tabs = new TabPane();
+		tabs.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 
-		GridPane schedulePane = this.writeSchedule(_ui.getSchedule());
-		ScrollPane scroll = new ScrollPane();
-		scroll.setPrefSize(700, 500);
-		scroll.setContent(schedulePane);
-		// this handles resize of nodes if user resizes stage
-		scroll.prefHeightProperty()
-				.addListener((obs, oldVal, newVal) -> this.setHeight(newVal.doubleValue()));
-		scroll.prefWidthProperty().addListener((obs, oldVal, newVal) -> this.setWidth(newVal.doubleValue()));
-		Scene scene = new Scene(scroll);
+		
+		for (Schedule schedule : _ui.getSchedules()) {
+			Tab tab = new Tab();
+			GridPane schedulePane = this.writeSchedule(schedule);
+			ScrollPane scroll = new ScrollPane();
+			scroll.setPrefSize(700, 500);
+			scroll.setContent(schedulePane);
+			// this handles resize of nodes if user resizes stage
+			scroll.prefHeightProperty()
+					.addListener((obs, oldVal, newVal) -> this.setHeight(newVal.doubleValue()));
+			scroll.prefWidthProperty().addListener((obs, oldVal, newVal) -> this.setWidth(newVal.doubleValue()));
+			tab.setContent(scroll);
+			tab.setText(schedule.getDatesValid());
+			tabs.getTabs().add(tab);
+		}
+
+		Scene scene = new Scene(tabs);
 		this.setScene(scene);
 		this.sizeToScene();
 	}

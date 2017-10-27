@@ -12,12 +12,14 @@ public class Schedule implements Serializable {
 	private Staff m_staff;
 	private Week m_week;
 	private Leads m_leads;
+	private String m_datesValid;
 	
 	// functions
-	public Schedule(Staff staff, Week week, Leads leads) {
+	public Schedule(Staff staff, Week week, Leads leads, String datesValid) {
 		this.m_staff = staff;
 		this.m_week = week;
 		this.m_leads = leads;
+		this.m_datesValid = datesValid;
 		this.computeShiftLeads();
 	}
 
@@ -32,13 +34,17 @@ public class Schedule implements Serializable {
 	public Leads getLeads() {
 		return this.m_leads;
 	}
+	
+	public String getDatesValid() {
+		return this.m_datesValid;
+	}
 
 	public boolean equals(Schedule other) {
 		return this.m_staff.equals(other.m_staff) && this.m_week.equals(other.m_week);
 	}
 
 	public Schedule copy() {
-		return new Schedule(this.m_staff.copy(), this.m_week.copy(), this.m_leads.copy());
+		return new Schedule(this.m_staff.copy(), this.m_week.copy(), this.m_leads.copy(), this.m_datesValid);
 	}
 	
 	private void computeShiftLeads() {

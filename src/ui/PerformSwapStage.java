@@ -6,6 +6,7 @@ import java.util.List;
 
 import comp110.Controller;
 import comp110.Employee;
+import comp110.Schedule;
 import comp110.Week;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -39,6 +40,8 @@ public class PerformSwapStage extends KarenStage {
 	private Button _addOrDropButton;
 	private ComboBox<String> _addOrDropComboBox;
 	private String _addOrDrop;
+	private Schedule _dropSchedule;
+	private Schedule _addSchedule;
 	private int _dropDay;
 	private int _dropHour;
 	private int _addDay;
@@ -119,9 +122,11 @@ public class PerformSwapStage extends KarenStage {
 
 	private void performSwap(ActionEvent event) {
 		String unavailableEmployee = "";
+		Schedule swapSchedule1 = _topBox.getSwapSchedule();
 		Employee swapEmployee1 = _topBox.getSwapEmployee();
 		int swapDay1 = _topBox.getSwapDay();
 		int swapHour1 = _topBox.getSwapHour();
+		Schedule swapSchedule2 = _topBox.getSwapSchedule();
 		Employee swapEmployee2 = _bottomBox.getSwapEmployee();
 		int swapDay2 = _bottomBox.getSwapDay();
 		int swapHour2 = _bottomBox.getSwapHour();
@@ -205,16 +210,16 @@ public class PerformSwapStage extends KarenStage {
 			return;
 		}
 		// remove employees
-		_ui.getSchedule().getWeek().getShift(swapDay1, swapHour1).remove(swapEmployee1);
-		_ui.getSchedule().getWeek().getShift(swapDay2, swapHour2).remove(swapEmployee2);
+		swapSchedule1.getWeek().getShift(swapDay1, swapHour1).remove(swapEmployee1);
+		swapSchedule2.getWeek().getShift(swapDay2, swapHour2).remove(swapEmployee2);
 		// add employees
-		_ui.getSchedule().getWeek().getShift(swapDay1, swapHour1).add(swapEmployee2);
-		_ui.getSchedule().getWeek().getShift(swapDay2, swapHour2).add(swapEmployee1);
+		swapSchedule1.getWeek().getShift(swapDay1, swapHour1).add(swapEmployee2);
+		swapSchedule2.getWeek().getShift(swapDay2, swapHour2).add(swapEmployee1);
 
 		// tell controller to push changes
-		_controller.uiRequestChangeSchedule(_ui.getSchedule(), "SWAPPED: " + swapEmployee1.getName() + " "
+		_controller.uiRequestChangeSchedule(_ui.getSchedules(), "SWAPPED: " + swapSchedule1.getDatesValid() + " "+ swapEmployee1.getName() + " "
 				+ Week.dayString(swapDay1) + " " + ((swapHour1 % 12) == 0 ? 12 : (swapHour1 % 12)) + " -- "
-				+ (((swapHour1 + 1) % 12) == 0 ? 12 : ((swapHour1 + 1) % 12)) + " with " + swapEmployee2.getName() + " "
+				+ (((swapHour1 + 1) % 12) == 0 ? 12 : ((swapHour1 + 1) % 12)) + " with " + swapSchedule2.getDatesValid() + " " + swapEmployee2.getName() + " "
 				+ Week.dayString(swapDay2) + " " + ((swapHour2 % 12) == 0 ? 12 : (swapHour2 % 12)) + " -- "
 				+ (((swapHour2 + 1) % 12) == 0 ? 12 : ((swapHour2 + 1) % 12)));
 	}
@@ -244,7 +249,7 @@ public class PerformSwapStage extends KarenStage {
 				_dropHour += 12;
 			}
 			List<Label> scheduledEmployees = new ArrayList<Label>();
-			for (Employee e : _ui.getSchedule().getWeek().getShift(_dropDay, _dropHour)) {
+			for (Employee e : _ui.getSchedules().getWeek().getShift(_dropDay, _dropHour)) {
 				Label toAdd = new Label(e.getName());
 				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
@@ -257,7 +262,7 @@ public class PerformSwapStage extends KarenStage {
 			_addOrDropButton.setDisable(true);
 		});
 		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			_employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+			_employeeToAddOrDrop = _ui.getSchedules().getStaff().getEmployeeByName(newValue.getText());
 			if (_employeeToAddOrDrop == null) {
 				_addOrDropButton.setDisable(true);
 			} else {
@@ -291,7 +296,7 @@ public class PerformSwapStage extends KarenStage {
 				_addHour += 12;
 			}
 			List<Label> allEmployees = new ArrayList<Label>();
-			for (Employee e : _ui.getSchedule().getStaff()) {
+			for (Employee e : _ui.getSchedules().getStaff()) {
 				Label toAdd = new Label(e.getName());
 				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
@@ -326,7 +331,7 @@ public class PerformSwapStage extends KarenStage {
 			_addOrDropButton.setDisable(true);
 		});
 		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			_employeeToAddOrDrop = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+			_employeeToAddOrDrop = _ui.getSchedules().getStaff().getEmployeeByName(newValue.getText());
 			if (_employeeToAddOrDrop == null) {
 				_addOrDropButton.setDisable(true);
 			} else {
@@ -341,19 +346,19 @@ public class PerformSwapStage extends KarenStage {
 	private void addDropButtonPress(ActionEvent event) {
 
 		if (_addOrDrop.equals("Add")) {
-			_ui.getSchedule().getWeek().getShift(_addDay, _addHour).add(_employeeToAddOrDrop);
+			_ui.getSchedules().getWeek().getShift(_addDay, _addHour).add(_employeeToAddOrDrop);
 		} else { // must be a drop
-			_ui.getSchedule().getWeek().getShift(_dropDay, _dropHour).remove(_employeeToAddOrDrop);
+			_ui.getSchedules().getWeek().getShift(_dropDay, _dropHour).remove(_employeeToAddOrDrop);
 
 		}
 		// tell controller to push changes
 		if (_addOrDrop.equals("Add")) {
-			_controller.uiRequestChangeSchedule(_ui.getSchedule(),
+			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
 					_addOrDrop.toUpperCase() + ": " + _employeeToAddOrDrop + " " + Week.dayString(_addDay) + " "
 							+ ((_addHour % 12) == 0 ? 12 : (_addHour % 12)) + " -- "
 							+ (((_addHour + 1) % 12) == 0 ? 12 : ((_addHour + 1) % 12)));
 		} else {
-			_controller.uiRequestChangeSchedule(_ui.getSchedule(),
+			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
 					_addOrDrop.toUpperCase() + ": " + _employeeToAddOrDrop + " " + Week.dayString(_dropDay) + " "
 							+ ((_dropHour % 12) == 0 ? 12 : (_dropHour % 12)) + " -- "
 							+ (((_dropHour + 1) % 12) == 0 ? 12 : ((_dropHour + 1) % 12)));

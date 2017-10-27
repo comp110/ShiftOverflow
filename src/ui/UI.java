@@ -30,7 +30,7 @@ public class UI extends Application {
 	private PasswordField _passwordField;
 	private Button _passwordSubmitButton;
 	private Employee _currentEmployee;
-	private Schedule _schedule;
+	private List<Schedule> _schedules;
 	private boolean _scheduleStageIsOpen;
 	private ScheduleStage _scheduleStage;
 	private ViewSwapsStage _viewSwapsStage; 
@@ -115,7 +115,7 @@ public class UI extends Application {
 	  //close the current stage
 		_scheduleStage.close();
 		//open a new one with the refreshed schedule
-		_scheduleStage = new ScheduleStage(_schedule, "Current Schedule", _controller, this, x, y);
+		_scheduleStage = new ScheduleStage(_schedules, "Current Schedule", _controller, this, x, y);
 	}
 
   // called from the controller when an Employee object is ready for
@@ -130,9 +130,9 @@ public class UI extends Application {
 		_availabilityStage.show();
 	}
 
-	public void displaySchedule(Schedule schedule) {
+	public void displaySchedule(List<Schedule> schedules) { //TODO, this may need to take in an arg of a schedule?, I changed to be 0 arg for now
 		// make sure valid schedule
-		if (this._schedule == null){
+		if (this._schedules.size() == 0){
 			this.displayMessage("There is no schedule loaded yet.  A schedule must be loaded before swapping.");
 			return;
 		}
@@ -140,7 +140,7 @@ public class UI extends Application {
 		if (_scheduleStageIsOpen) { // don't want to open another one if we already have one
 		  return;
 		}
-		_scheduleStage = new ScheduleStage(schedule, "Current Schedule", _controller, this);
+		_scheduleStage = new ScheduleStage(schedules, "Current Schedule", _controller, this);
 		// once we have the schedule we can enable the other buttons
 		// TODO perhaps changes this so that schedule is available from the
 		// start
@@ -150,7 +150,7 @@ public class UI extends Application {
 
 	public void displayPossibleSwaps() {
 		// make sure valid schedule
-		if (this._schedule == null){
+		if (this._schedules == null){
 			this.displayMessage("There is no schedule loaded yet. A schedule must be loaded before swapping.");
 			return;
 		}
@@ -245,9 +245,9 @@ public class UI extends Application {
 	public List<String> getDaysList() {
 		List<String> daysList = new ArrayList<String>();
 		for (int day = 0; day < 7; day++) {
-			for (int hour = 0; hour < this.getSchedule().getWeek().getShifts()[day].length; hour++) {
+			for (int hour = 0; hour < this.getSchedules().get(0).getWeek().getShifts()[day].length; hour++) {
 				// if at least one shift is populated
-				if (this.getSchedule().getWeek().getShifts()[day][hour].size() > 0
+				if (this.getSchedules().get(0).getWeek().getShifts()[day][hour].size() > 0
 						&& !daysList.contains(Week.dayString(day))) {
 					daysList.add(Week.dayString(day));
 				}
@@ -261,23 +261,23 @@ public class UI extends Application {
 		List<String> hoursList = new ArrayList<String>();
 		int minHour = -1;
 		// find min
-		for (int i = 0; i < this.getSchedule().getWeek().getShifts()[Week.dayInt(day)].length; i++) {
-			if (this.getSchedule().getWeek().getShift(Week.dayInt(day), i).size() > 0) {
+		for (int i = 0; i < this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)].length; i++) {
+			if (this.getSchedules().get(0).getWeek().getShift(Week.dayInt(day), i).size() > 0) {
 				minHour = i;
 				break;
 			}
 		}
 		// find max
 		int maxHour = -1;
-		for (int i = this.getSchedule().getWeek().getShifts()[Week.dayInt(day)][minHour]
-				.getHour(); i < this.getSchedule().getWeek().getShifts()[Week.dayInt(day)].length; i++) {
-			if (this.getSchedule().getWeek().getShift(Week.dayInt(day), i).size() == 0) {
+		for (int i = this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][minHour]
+				.getHour(); i < this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)].length; i++) {
+			if (this.getSchedules().get(0).getWeek().getShift(Week.dayInt(day), i).size() == 0) {
 				break;
 			}
 			maxHour = i;
 		}
-		for (int i = this.getSchedule().getWeek().getShifts()[Week.dayInt(day)][minHour]
-				.getHour(); i <= this.getSchedule().getWeek().getShifts()[Week.dayInt(day)][maxHour].getHour(); i++) {
+		for (int i = this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][minHour]
+				.getHour(); i <= this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][maxHour].getHour(); i++) {
 			hoursList.add(((i % 12) == 0 ? 12 : (i % 12)) + " -- " + (((i + 1) % 12) == 0 ? 12 : ((i + 1) % 12)));
 		}
 		return hoursList;
@@ -325,12 +325,21 @@ public class UI extends Application {
 		}
 	}
 	
-	public void setSchedule(Schedule s){
-		_schedule = s;
+	public Schedule getScheduleByName(String dateValid) {
+		for (Schedule s: _schedules) {
+			if (s.getDatesValid().equals(dateValid)) {
+				return s;
+			}
+		}
+		return null; //could not find
 	}
 	
-	public Schedule getSchedule() {
-		return _schedule;
+	public void setSchedules(List<Schedule> s){
+		_schedules = s;
+	}
+	
+	public List<Schedule> getSchedules() {
+		return _schedules;
 	}
 	
 	public Employee getCurrentEmployee() {

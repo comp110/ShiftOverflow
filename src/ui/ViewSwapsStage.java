@@ -18,6 +18,9 @@ import javafx.collections.FXCollections;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
@@ -31,36 +34,44 @@ public class ViewSwapsStage extends KarenStage {
 
 	private void renderSwapStage() {
 		// make sure valid schedule
-		if (_ui.getSchedule() == null) {
+		if (_ui.getSchedules() == null) {
 			_ui.displayMessage("There is no schedule loaded yet.  A schedule must be loaded before swapping.");
 			return;
 		}
 
 		Group root = new Group();
 		Scene scene = new Scene(root);
-		BorderPane rootPane = new BorderPane();
+		TabPane rootPane = new TabPane();
+		rootPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
 		root.getChildren().add(rootPane);
 		this.setScene(scene);
-		javafx.collections.ObservableList<String> scheduledShifts = FXCollections
-				.observableArrayList(this.getScheduledShifts(_ui.getSchedule()));
-		ListView<String> scheduledShiftsListView = new ListView<String>(scheduledShifts);
-		HBox listBox = new HBox();
-		listBox.getChildren().add(scheduledShiftsListView);
+		for (Schedule schedule : _ui.getSchedules()) {
+			Tab tab = new Tab(schedule.getDatesValid());
+			BorderPane borderPane = new BorderPane();
+			javafx.collections.ObservableList<String> scheduledShifts = FXCollections
+					.observableArrayList(this.getScheduledShifts(schedule));
+			ListView<String> scheduledShiftsListView = new ListView<String>(scheduledShifts);
+			HBox listBox = new HBox();
+			listBox.getChildren().add(scheduledShiftsListView);
 
-		ListView<String> availableSwapsListView = new ListView<String>();
-		HBox swapBox = new HBox();
-		swapBox.getChildren().add(availableSwapsListView);
-		scheduledShiftsListView.getSelectionModel().selectedItemProperty()
-				.addListener((observable, oldValue, newValue) -> {
-					// we sort the list of potential swaps by likelihood it will
-					// be compatible
-					javafx.collections.ObservableList<String> availableToSwap = FXCollections
-							.observableArrayList(getOrderedPotentialSwaps(_ui.getSchedule(),
-									Week.dayInt(newValue.split(" ")[0]), Integer.parseInt(newValue.split(" ")[1])));
-					availableSwapsListView.setItems(availableToSwap);
-				});
-		rootPane.setLeft(listBox);
-		rootPane.setRight(swapBox);
+			ListView<String> availableSwapsListView = new ListView<String>();
+			HBox swapBox = new HBox();
+			swapBox.getChildren().add(availableSwapsListView);
+			scheduledShiftsListView.getSelectionModel().selectedItemProperty()
+					.addListener((observable, oldValue, newValue) -> {
+						// we sort the list of potential swaps by likelihood it will
+						// be compatible
+						javafx.collections.ObservableList<String> availableToSwap = FXCollections
+								.observableArrayList(getOrderedPotentialSwaps(schedule,
+										Week.dayInt(newValue.split(" ")[0]), Integer.parseInt(newValue.split(" ")[1])));
+						availableSwapsListView.setItems(availableToSwap);
+					});
+			borderPane.setLeft(listBox);
+			borderPane.setRight(swapBox);
+			tab.setContent(borderPane);
+			rootPane.getTabs().add(tab);
+		}
+		
 
 		this.sizeToScene();
 		this.setResizable(false);

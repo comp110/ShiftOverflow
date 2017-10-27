@@ -1,5 +1,7 @@
 package comp110;
 
+import java.util.List;
+
 import javafx.application.Platform;
 import ui.UI;
 
@@ -40,12 +42,12 @@ public class Controller implements Storage.StorageListener {
 		});
 		// go ahead and give them the schedule immediately for use
 		try {
-			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(),
+			List<Schedule> schedules = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_folder(),
 					this.m_storage.get_path_to_onyen_csv_directory(), this.m_storage.get_schedule_leads_filename());
-			this.m_ui.setSchedule(schedule);
+			this.m_ui.setSchedules(schedules);
 		} catch (Exception e) {
 			// tell the ui things suck
-			this.m_ui.setSchedule(null);
+			this.m_ui.setSchedules(null);
 			Platform.runLater(
 					() -> this.m_ui.displayMessage("Controller::storage_get_files_complete(): " + e.toString()));
 		}
@@ -61,10 +63,10 @@ public class Controller implements Storage.StorageListener {
 		// an exception
 		// ui needs to be ready to handle null schedule
 		try {
-			Schedule schedule = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_filename(),
+			List<Schedule> schedules = this.m_parser.parseSchedule(this.m_storage.get_schedule_json_folder(),
 					this.m_storage.get_path_to_onyen_csv_directory(), this.m_storage.get_schedule_leads_filename());
-			this.m_ui.setSchedule(schedule);
-			Platform.runLater(() -> this.m_ui.displaySchedule(schedule));
+			this.m_ui.setSchedules(schedules);
+			Platform.runLater(() -> this.m_ui.displaySchedule(schedules));
 		} catch (Exception e) {
 			Platform.runLater(() -> this.m_ui.displayMessage("Controller::uiRequestSchedule(): " + e.toString()));
 		}
@@ -106,9 +108,9 @@ public class Controller implements Storage.StorageListener {
 		}
 	}
 
-	public void uiRequestChangeSchedule(Schedule schedule, String commit_message) {
+	public void uiRequestChangeSchedule(List<Schedule> schedules, String commit_message) {
 		try {
-			this.m_parser.writeScheduleToJson(schedule, this.m_storage.get_schedule_json_filename());
+			this.m_parser.writeScheduleToJson(schedules, this.m_storage.get_schedule_json_folder());
 			this.m_storage.save_files(commit_message);
 		} catch (Exception e) {
 			this.m_ui.displayMessage("Controller::uiRequestChangeSchedule(): " + e.toString());

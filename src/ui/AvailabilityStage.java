@@ -115,7 +115,7 @@ public class AvailabilityStage extends KarenStage {
     // start the perform swap stage
     _performSwapButton.setOnAction((event) -> {
       // make sure valid schedule
-      if (_ui.getSchedule() == null) {
+      if (_ui.getSchedules() == null) {
         _controller.displayMessage(
             "There is no schedule loaded yet. A schedule must be loaded before swapping.");
         return;

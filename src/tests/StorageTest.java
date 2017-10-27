@@ -77,7 +77,7 @@ public class StorageTest {
 		}, ".");
 		
 		String path = "./repo/testData/schedule.json";
-		assertTrue(path.equals(storage.get_schedule_json_filename()));
+		assertTrue(path.equals(storage.get_schedule_json_folder()));
 	}
 
 	@Test

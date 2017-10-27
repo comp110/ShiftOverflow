@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import comp110.Employee;
+import comp110.Schedule;
 import comp110.Week;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
@@ -16,6 +17,7 @@ public class SwapBox extends HBox {
 	
 	private static final int LIST_VIEW_HEIGHT = 250;
 
+	private Schedule _swapSchedule;
 	private int _swapDay;
 	private int _swapHour;
 	private Employee _swapEmployee;
@@ -24,9 +26,29 @@ public class SwapBox extends HBox {
 
 	public SwapBox(UI ui) {
 		_ui = ui;
-
+		
+		List<String> scheduleListAsString = new ArrayList<String>();
+		for (Schedule s : _ui.getSchedules()) {
+			scheduleListAsString.add(s.getDatesValid());
+		}
+		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListAsString);
+		ListView<String> scheduleListView = new ListView<String>(scheduleList);
+		this.getChildren().add(scheduleListView);
+		
 		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
 		ListView<String> dayListView = new ListView<String>(dayList);
+		
+		
+		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_swapSchedule = _ui.getScheduleByName(newValue); // newValue will be the dateValid property of the schedule
+			javafx.collections.ObservableList<String> days = FXCollections
+					.observableArrayList(_ui.getDaysList());
+			// newValue is the new day
+			dayListView.setItems(days);
+		});
+
+
+
 		this.getChildren().add(dayListView);
 		ListView<String> hourListView = new ListView<String>();
 		this.getChildren().add(hourListView);
@@ -50,7 +72,7 @@ public class SwapBox extends HBox {
 			}
 			_swapHour = newHour;
 			List<Label> scheduledEmployees = new ArrayList<Label>();
-			for (Employee e : _ui.getSchedule().getWeek().getShift(_swapDay, newHour)) {
+			for (Employee e : _swapSchedule.getWeek().getShift(_swapDay, newHour)) {
 				Label toAdd = new Label(e.getName());
 				if (toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
@@ -70,12 +92,16 @@ public class SwapBox extends HBox {
 	// and coordinate swapping
 	public void registerSwapListener(Button saveButton, SwapBox otherBox) {
 		_personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			_swapEmployee = _ui.getSchedule().getStaff().getEmployeeByName(newValue.getText());
+			_swapEmployee = _swapSchedule.getStaff().getEmployeeByName(newValue.getText());
 
 			if (_swapEmployee != null && otherBox.getSwapEmployee() != null) {
 				saveButton.setDisable(false);
 			}
 		});
+	}
+	
+	public Schedule getSwapSchedule() {
+		return _swapSchedule;
 	}
 	
 	public Employee getSwapEmployee() {

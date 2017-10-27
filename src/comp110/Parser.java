@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import com.google.gson.Gson;
 import java.io.PrintWriter;
@@ -79,63 +81,75 @@ public class Parser {
 		return new Employee(name, onyen, capacity, gender.equals("M") ? false : true, level, availability);
 	}
 
-	public Schedule parseSchedule(String jsonFile, String staff_dir, String leadsFile) throws Exception {
+	public List<Schedule> parseSchedule(String scheduleFolderPath, String staff_dir, String leadsFile) throws Exception {
+		
+		List<Schedule> schedules = new ArrayList<Schedule>();
 
 		// read in the json file
 		Gson gson = new Gson();
 		String json = "";
 
-		Scanner scanner = null;
+		File scheduleFile = null;
 		try {
-			File file = new File(jsonFile);
-			scanner = new Scanner(file);
+			scheduleFile = new File(scheduleFolderPath);
+
+		} catch (Exception e) {
+			throw new Exception("Parser::parseSchedule(): Error reading schedule folder=" + scheduleFolderPath);
+		}
+		
+		for (File scheduleJson : scheduleFile.listFiles()) {
+			Scanner scanner = new Scanner(scheduleFile);
 			scanner.useDelimiter("\\Z");
 			json = scanner.next();
 			scanner.close();
-		} catch (FileNotFoundException e) {
-			throw new Exception("Parser::parseSchedule(): Error reading json file=" + jsonFile);
-		}
 
-		// create the json week object
-		JsonWeek jsonweek = gson.fromJson(json, JsonWeek.class);
-		if (jsonweek == null) {
-			throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + jsonFile);
-		}
-		if (jsonweek.getShifts() == null){
-			// some problem parsing json
-			throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + jsonFile);
-		}
+			// create the json week object
+			JsonWeek jsonweek = gson.fromJson(json, JsonWeek.class);
+			if (jsonweek == null) {
+				throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
+			}
+			if (jsonweek.getShifts() == null){
+				// some problem parsing json
+				throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
+			}
 
-		// now we have the json we need to reconstruct the schedule object
-		// first we will build the staff object
-		Staff staff = null;
-		try {
-			staff = parseStaff(staff_dir);
-		} catch (Exception e) {
-			throw new Exception("Parser::parseSchedule(): " + e.toString());
-		}
+			// now we have the json we need to reconstruct the schedule object
+			// first we will build the staff object
+			Staff staff = null;
+			try {
+				staff = parseStaff(staff_dir);
+			} catch (Exception e) {
+				throw new Exception("Parser::parseSchedule(): " + e.toString());
+			}
 
-		// now build the week object
-		Week week = new Week("Current Schedule");
+			// now build the week object
+			Week week = new Week("Current Schedule");
 
-		// grab a reference to the shifts array
-		Shift[][] shifts = week.getShifts();
-		for (int day = 0; day < NUMBER_DAYS; day++) {
-			for (int hour = 0; hour < NUMBER_HOURS; hour++) {
-				for (int i = 0; i < jsonweek.getShifts()[day][hour].getScheduled().length; i++) {
-					String onyen = jsonweek.getShifts()[day][hour].getScheduled()[i];
-					Employee employee = this.getEmployeeByOnyen(onyen, staff);
-					if (employee == null) {
-						throw new Exception(
-								"Parser::parseSchedule(): No Employee in Staff for Onyen in Schdeule. Onyen=" + onyen);
+			// grab a reference to the shifts array
+			Shift[][] shifts = week.getShifts();
+			for (int day = 0; day < NUMBER_DAYS; day++) {
+				for (int hour = 0; hour < NUMBER_HOURS; hour++) {
+					for (int i = 0; i < jsonweek.getShifts()[day][hour].getScheduled().length; i++) {
+						String onyen = jsonweek.getShifts()[day][hour].getScheduled()[i];
+						Employee employee = this.getEmployeeByOnyen(onyen, staff);
+						if (employee == null) {
+							throw new Exception(
+									"Parser::parseSchedule(): No Employee in Staff for Onyen in Schdeule. Onyen=" + onyen);
+						}
+						// add the employee to the shift
+						shifts[day][hour].add(employee);
 					}
-					// add the employee to the shift
-					shifts[day][hour].add(employee);
 				}
 			}
+			Leads leads = this.parseLeads(leadsFile, staff);
+			schedules.add(new Schedule(staff, week, leads, scheduleJson.getName().substring(9, scheduleJson.getName().length()))); // grab just the date portion of file name
 		}
-		Leads leads = this.parseLeads(leadsFile, staff);
-		return new Schedule(staff, week, leads);
+		
+		if (schedules.size() == 0) {
+			throw new Exception ("Parser::parseSchedule(): No schedules found to load in: " + scheduleFolderPath);
+		} else {
+			return schedules;
+		}
 	}
 	
 	public void writeFile(Employee employee, String filename) throws Exception{
@@ -258,25 +272,28 @@ public class Parser {
 		return leads;
 	}
 
-	public void writeScheduleToJson(Schedule schedule, String path) throws Exception{
-		if (schedule == null){
-			throw new Exception("Parser::writeScheduleToJson(): Schedule is null");
+	public void writeScheduleToJson(List<Schedule> schedules, String path) throws Exception {
+		if (schedules.size() == 0){
+			throw new Exception("Parser::writeScheduleToJson(): Schedule list is empty");
 		}
 		if (path.equals("") || path == null){
 			throw new Exception("Parser::writeScheduleToJson(): Path is invalid");
 		}
 		
 		// create gson object
-		try{
-		Gson gson = new Gson();
-			JsonWeek jsonWeek = schedule.getWeek().toJsonWeek();
-			BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(new File(path)), 65536);
-			String json = gson.toJson(jsonWeek);
-			writer.write(json.getBytes());
-			writer.close();
-		} catch (Exception e){
-			throw new Exception("Parser::writeScheduleToJson(): Unable to open file=" + path);
+		for (Schedule schedule : schedules) {
+			try{
+				Gson gson = new Gson();
+					JsonWeek jsonWeek = schedule.getWeek().toJsonWeek();
+					BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(new File(path + File.pathSeparator + "schedule-" + schedule.getDatesValid() + ".json")), 65536);
+					String json = gson.toJson(jsonWeek);
+					writer.write(json.getBytes());
+					writer.close();
+				} catch (Exception e){
+					throw new Exception("Parser::writeScheduleToJson(): Unable to open file=" + path);
+				}
 		}
+
 	}
 	
 	public String parseCurrentVersion(String versionPath) {
