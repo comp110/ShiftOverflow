@@ -47,7 +47,9 @@ public class Schedule implements Serializable {
 		return new Schedule(this.m_staff.copy(), this.m_week.copy(), this.m_leads.copy(), this.m_datesValid);
 	}
 	
-	private void computeShiftLeads() {
+	public void computeShiftLeads() {
+		// before computing we should invalidate any existing
+		invalidateShiftLeads();
 		for (int day = 0; day < m_week.getShifts().length; day++) {
 			for (int hour = 0; hour < m_week.getShifts()[day].length; hour++) {
 				Employee lead = null;
@@ -63,6 +65,14 @@ public class Schedule implements Serializable {
 				if (lead != null) {
 					m_week.getShift(day, hour).setLead(lead);
 				}
+			}
+		}
+	}
+	
+	private void invalidateShiftLeads() {
+		for (int day = 0; day < m_week.getShifts().length; day++) {
+			for (int hour = 0; hour < m_week.getShifts()[day].length; hour++) {
+				m_week.getShift(day, hour).setLead(null);
 			}
 		}
 	}

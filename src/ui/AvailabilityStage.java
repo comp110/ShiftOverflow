@@ -303,8 +303,6 @@ public class AvailabilityStage extends KarenStage {
     // now that the schedule has changed we can let the person save
     _saveAvailabilityButton.setDisable(false);
     int[][] updatedAvailability = _ui.getCurrentEmployee().getAvailability();
-    // System.out.println("Day: " + check.getDay() + " Hour: " +
-    // check.getHour());
     HBox parent = (HBox) check.getParent();
     if (check.isSelected()) {
       parent.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));

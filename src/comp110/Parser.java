@@ -25,7 +25,7 @@ public class Parser {
 
 	// functions
 	public Parser() {
-		
+
 	}
 
 	public Employee parseEmployee(String file) throws Exception {
@@ -81,8 +81,9 @@ public class Parser {
 		return new Employee(name, onyen, capacity, gender.equals("M") ? false : true, level, availability);
 	}
 
-	public List<Schedule> parseSchedules(String scheduleFolderPath, String staff_dir, String leadsFile) throws Exception {
-		
+	public List<Schedule> parseSchedules(String scheduleFolderPath, String staff_dir, String leadsFile)
+			throws Exception {
+
 		List<Schedule> schedules = new ArrayList<Schedule>();
 
 		// read in the json file
@@ -105,18 +106,21 @@ public class Parser {
 				json = scanner.nextLine();
 			} catch (Exception e) {
 				System.err.println(e.toString());
-				throw new Exception("Parser::parseSchedule(): Error reading schedule file= "+ scheduleJson.getAbsolutePath());
+				throw new Exception(
+						"Parser::parseSchedule(): Error reading schedule file= " + scheduleJson.getAbsolutePath());
 			}
 			scanner.close();
 
 			// create the json week object
 			JsonWeek jsonweek = gson.fromJson(json, JsonWeek.class);
 			if (jsonweek == null) {
-				throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
+				throw new Exception(
+						"Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
 			}
-			if (jsonweek.getShifts() == null){
+			if (jsonweek.getShifts() == null) {
 				// some problem parsing json
-				throw new Exception("Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
+				throw new Exception(
+						"Parser::parseSchedule(): Error parsing json file ito jsonweek. File=" + scheduleFolderPath);
 			}
 
 			// now we have the json we need to reconstruct the schedule object
@@ -140,7 +144,8 @@ public class Parser {
 						Employee employee = this.getEmployeeByOnyen(onyen, staff);
 						if (employee == null) {
 							throw new Exception(
-									"Parser::parseSchedule(): No Employee in Staff for Onyen in Schdeule. Onyen=" + onyen);
+									"Parser::parseSchedule(): No Employee in Staff for Onyen in Schdeule. Onyen="
+											+ onyen);
 						}
 						// add the employee to the shift
 						shifts[day][hour].add(employee);
@@ -148,17 +153,25 @@ public class Parser {
 				}
 			}
 			Leads leads = this.parseLeads(leadsFile, staff);
-			schedules.add(new Schedule(staff, week, leads, scheduleJson.getName().substring(9, scheduleJson.getName().length()))); // grab just the date portion of file name
+			schedules.add(new Schedule(staff, week, leads,
+					scheduleJson.getName().substring(9, scheduleJson.getName().length()).split("\\.")[0])); // grab
+																											// just
+																											// the
+																											// date
+																											// portion
+																											// of
+																											// file
+																											// name
 		}
-		
+
 		if (schedules.size() == 0) {
-			throw new Exception ("Parser::parseSchedule(): No schedules found to load in: " + scheduleFolderPath);
+			throw new Exception("Parser::parseSchedule(): No schedules found to load in: " + scheduleFolderPath);
 		} else {
 			return schedules;
 		}
 	}
-	
-	public void writeFile(Employee employee, String filename) throws Exception{
+
+	public void writeFile(Employee employee, String filename) throws Exception {
 
 		// check if employee is null first
 		if (employee == null) {
@@ -168,7 +181,7 @@ public class Parser {
 		// write to file
 		PrintWriter fw = null;
 		try {
-			System.out.println("Writing Schedule to" + filename);
+			// System.out.println("Writing Schedule to" + filename);
 			fw = new PrintWriter(filename);
 			StringBuilder sb = new StringBuilder();
 
@@ -216,20 +229,20 @@ public class Parser {
 			fw.close();
 		} catch (Exception e) {
 			// unable to open file
-			if (fw != null){
+			if (fw != null) {
 				fw.close();
 			}
 			throw new Exception("Parser::writeFile(): Unable to open file for writing. File=" + filename);
 		}
 	}
 
-	private Staff parseStaff(String dir) throws Exception{
+	private Staff parseStaff(String dir) throws Exception {
 		// create staff object
 		Staff staff = new Staff();
 
 		// get a file object to the directory containing all the csv's
 		File csvDirectory = new File(dir);
-		
+
 		// create an employee from each csv
 		for (File csv : csvDirectory.listFiles()) {
 			Employee employee = null;
@@ -256,7 +269,7 @@ public class Parser {
 		// not able to find employee
 		return null;
 	}
-	
+
 	private Leads parseLeads(String leadsFile, Staff staff) throws Exception {
 		BufferedReader reader = null;
 		Leads leads = new Leads(staff);
@@ -279,41 +292,42 @@ public class Parser {
 	}
 
 	public void writeScheduleToJson(List<Schedule> schedules, String path) throws Exception {
-		if (schedules.size() == 0){
+		if (schedules.size() == 0) {
 			throw new Exception("Parser::writeScheduleToJson(): Schedule list is empty");
 		}
-		if (path.equals("") || path == null){
+		if (path.equals("") || path == null) {
 			throw new Exception("Parser::writeScheduleToJson(): Path is invalid");
 		}
-		
+
 		// create gson object
 		for (Schedule schedule : schedules) {
-			try{
+			try {
 				Gson gson = new Gson();
-					JsonWeek jsonWeek = schedule.getWeek().toJsonWeek();
-					BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(new File(path + File.pathSeparator + "schedule-" + schedule.getDatesValid() + ".json")), 65536);
-					String json = gson.toJson(jsonWeek);
-					writer.write(json.getBytes());
-					writer.close();
-				} catch (Exception e){
-					throw new Exception("Parser::writeScheduleToJson(): Unable to open file=" + path);
-				}
+				JsonWeek jsonWeek = schedule.getWeek().toJsonWeek();
+				File f = new File(path + "schedule_" + schedule.getDatesValid() + ".json");
+				BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(f), 65536);
+				String json = gson.toJson(jsonWeek);
+				writer.write(json.getBytes());
+				writer.close();
+			} catch (Exception e) {
+				throw new Exception("Parser::writeScheduleToJson(): Unable to open file=" + path);
+			}
 		}
 
 	}
-	
+
 	public String parseCurrentVersion(String versionPath) {
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(new FileReader(versionPath));
 		} catch (FileNotFoundException e) {
-			return ""; //if we can't find the file just carry on
+			return ""; // if we can't find the file just carry on
 		}
 		String currentVersion = null;
 		try {
 			currentVersion = reader.readLine();
 			reader.close();
-		} catch (IOException e) { //This should never happen 
+		} catch (IOException e) { // This should never happen
 			System.err.println("lol this should never happen");
 			e.printStackTrace();
 		}

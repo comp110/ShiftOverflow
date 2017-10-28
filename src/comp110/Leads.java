@@ -12,7 +12,6 @@ public class Leads extends ArrayList<Employee> {
 	}
 	
 	public void add(String onyen) {
-		System.out.print(onyen);
 		Employee e = _staff.getEmployeeByOnyen(onyen);
 		if (e != null) {
 			super.add(e);

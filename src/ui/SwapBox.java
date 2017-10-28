@@ -6,6 +6,7 @@ import java.util.List;
 import comp110.Employee;
 import comp110.Schedule;
 import comp110.Week;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -15,8 +16,6 @@ import javafx.scene.paint.Color;
 
 public class SwapBox extends HBox {
 	
-	private static final int LIST_VIEW_HEIGHT = 250;
-
 	private Schedule _swapSchedule;
 	private int _swapDay;
 	private int _swapHour;
@@ -33,10 +32,8 @@ public class SwapBox extends HBox {
 		}
 		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListAsString);
 		ListView<String> scheduleListView = new ListView<String>(scheduleList);
-		this.getChildren().add(scheduleListView);
 		
-		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
-		ListView<String> dayListView = new ListView<String>(dayList);
+		ListView<String> dayListView = new ListView<String>();
 		
 		
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -45,13 +42,13 @@ public class SwapBox extends HBox {
 					.observableArrayList(_ui.getDaysList());
 			// newValue is the new day
 			dayListView.setItems(days);
+			dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
+
 		});
 
 
 
-		this.getChildren().add(dayListView);
 		ListView<String> hourListView = new ListView<String>();
-		this.getChildren().add(hourListView);
 		_swapDay = 0;
 
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -60,10 +57,11 @@ public class SwapBox extends HBox {
 					.observableArrayList(_ui.getHoursList(newValue));
 			// newValue is the new day
 			hourListView.setItems(hours);
+			hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
+
 		});
 
 		_personListView = new ListView<Label>();
-		this.getChildren().add(_personListView);
 		hourListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			int newHour = Integer.parseInt(newValue.split(" ")[0]);
 			if (newHour < 9) {
@@ -81,11 +79,23 @@ public class SwapBox extends HBox {
 			}
 			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(scheduledEmployees);
 			_personListView.setItems(people);
-		});
+			_personListView.prefHeightProperty().bind(Bindings.size(people).multiply(24));
 
-		dayListView.setPrefHeight(LIST_VIEW_HEIGHT);
-		hourListView.setPrefHeight(LIST_VIEW_HEIGHT);
-		_personListView.setPrefHeight(LIST_VIEW_HEIGHT);
+		});
+		
+		// https://stackoverflow.com/questions/17429508/how-do-you-get-javafx-listview-to-be-the-height-of-its-items
+		scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		dayListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		hourListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		_personListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		
+		this.getChildren().add(scheduleListView);
+		this.getChildren().add(dayListView);
+		this.getChildren().add(hourListView);
+		this.getChildren().add(_personListView);
+
+		
+		
 	}
 
 	// needs to be called on each swapBox so that they can talk to each other

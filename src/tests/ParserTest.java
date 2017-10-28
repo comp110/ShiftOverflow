@@ -1,6 +1,9 @@
 package tests;
 
 import static org.junit.Assert.*;
+
+import java.util.List;
+
 import org.junit.*;
 
 import comp110.Employee;
@@ -40,7 +43,7 @@ public class ParserTest {
 	public void parseSchedule_test() {
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedules("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
+			List<Schedule> s = p.parseSchedules("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			Shift test1 = new Shift(0, 1, 0);
 			Shift test2 = new Shift(0, 2, 0);
 			Shift test3 = new Shift(1, 5, 0); 
@@ -89,7 +92,7 @@ public class ParserTest {
 			test7.add(cphamlet);
 			test7.add(sunmiche);
 			
-			Shift[][] shift = s.getWeek().getShifts();
+			Shift[][] shift = s.get(0).getWeek().getShifts();
 			
 			assertEquals(shift[0][1].equals(test1), true);
 			assertEquals(shift[0][2].equals(test2), true);
@@ -131,9 +134,9 @@ public class ParserTest {
 	public void writeScheduleToJson_Test() {
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedules("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
+			List<Schedule> s = p.parseSchedules("testData/schedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			p.writeScheduleToJson(s, "testData/testSchedule.json");
-			Schedule result = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
+			List<Schedule> result = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			assertEquals(s.equals(result), true);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -170,9 +173,9 @@ public class ParserTest {
 	public void writeRepeatedSchedules(){
 		Parser p = new Parser();
 		try {
-			Schedule s = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
+			List<Schedule> s = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			p.writeScheduleToJson(s, "testData/testSchedule.json");
-			Schedule result = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
+			List<Schedule> result = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");
 			for(int i = 0; i < 20; i++){
 				p.writeScheduleToJson(result, "testData/testSchedule.json");
 				result = p.parseSchedules("testData/testSchedule.json", "data/spring-17/staff", "data/fall-17/leads.csv");

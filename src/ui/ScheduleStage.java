@@ -25,8 +25,11 @@ import javafx.scene.text.TextFlow;
 
 public class ScheduleStage extends KarenStage {
 	
-	public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui) {
+	private String _currentlyOpenedTabTitle;
+	
+	public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui, String tabToReopen) {
 		super(title, controller, ui);
+		_currentlyOpenedTabTitle = tabToReopen;
 		this.setOnCloseRequest((event) -> {
 			_ui.setScheduleStageIsOpen(false);
 			this.close();
@@ -37,8 +40,8 @@ public class ScheduleStage extends KarenStage {
 	}
 	
 	// called whenever we refresh an open schedule stage, we want to set same x and y as previously
-	 public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui, double x, double y) {
-	   this(schedules, title, controller, ui);
+	 public ScheduleStage(List<Schedule> schedules, String title, Controller controller, UI ui, double x, double y, String tabToReopen) {
+	   this(schedules, title, controller, ui, tabToReopen);
 	   this.setX(x);
 	   this.setY(y);
 	 }
@@ -55,7 +58,6 @@ public class ScheduleStage extends KarenStage {
 		
 		TabPane tabs = new TabPane();
 		tabs.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-
 		
 		for (Schedule schedule : _ui.getSchedules()) {
 			Tab tab = new Tab();
@@ -70,6 +72,19 @@ public class ScheduleStage extends KarenStage {
 			tab.setContent(scroll);
 			tab.setText(schedule.getDatesValid());
 			tabs.getTabs().add(tab);
+		}
+		
+        tabs.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+        	_currentlyOpenedTabTitle = newValue.getText();
+        });
+		
+		// reopen last open tab if there was one
+		if (_currentlyOpenedTabTitle != null) {
+			for (Tab t : tabs.getTabs()) {
+				if (t.getText().equals(_currentlyOpenedTabTitle)) {
+					tabs.getSelectionModel().select(t);
+				}
+			}
 		}
 
 		Scene scene = new Scene(tabs);
@@ -189,4 +204,7 @@ public class ScheduleStage extends KarenStage {
 		return max;
 	}
 
+	public String getCurrentlyOpenedTabTitle() {
+		return _currentlyOpenedTabTitle;
+	}
 }

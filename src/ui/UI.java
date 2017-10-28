@@ -114,8 +114,13 @@ public class UI extends Application {
 	  double y = _scheduleStage.getY(); 
 	  //close the current stage
 		_scheduleStage.close();
+		// recompute shift leads in case there was a drop/add/swap
+		for (Schedule s: _schedules) {
+			s.computeShiftLeads();
+		}
+		String currentTabOpenTitle = _scheduleStage.getCurrentlyOpenedTabTitle();
 		//open a new one with the refreshed schedule
-		_scheduleStage = new ScheduleStage(_schedules, "Current Schedule", _controller, this, x, y);
+		_scheduleStage = new ScheduleStage(_schedules, "Current Schedule", _controller, this, x, y, currentTabOpenTitle);
 	}
 
   // called from the controller when an Employee object is ready for
@@ -140,7 +145,7 @@ public class UI extends Application {
 		if (_scheduleStageIsOpen) { // don't want to open another one if we already have one
 		  return;
 		}
-		_scheduleStage = new ScheduleStage(schedules, "Current Schedule", _controller, this);
+		_scheduleStage = new ScheduleStage(schedules, "Current Schedule", _controller, this, null);
 		// once we have the schedule we can enable the other buttons
 		// TODO perhaps changes this so that schedule is available from the
 		// start

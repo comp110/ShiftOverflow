@@ -8,8 +8,7 @@ import comp110.Controller;
 import comp110.Employee;
 import comp110.Schedule;
 import comp110.Week;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -19,7 +18,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Labeled;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -36,7 +34,8 @@ public class PerformSwapStage extends KarenStage {
 	private boolean _continueToSwap;
 	private SwapBox _topBox;
 	private SwapBox _bottomBox;
-	private BorderPane _addOrDropPane;
+	private BorderPane _rootPane;
+	private HBox _addOrDropContainer;
 	private Button _addOrDropButton;
 	private ComboBox<String> _addOrDropComboBox;
 	private String _addOrDrop;
@@ -69,7 +68,7 @@ public class PerformSwapStage extends KarenStage {
 		// disable save button by default
 		saveButton.setDisable(true);
 		// TODO figure out how to not hardcode this and just make it fill stage
-		saveButton.setPrefWidth(744);
+		saveButton.setPrefWidth(992);
 		saveButton.setOnAction(this::performSwap);
 		rootSwapPane.setBottom(saveButton);
 		rootSwapPane.setTop(_topBox);
@@ -80,11 +79,13 @@ public class PerformSwapStage extends KarenStage {
 	}
 
 	private BorderPane getAddDropPane() {
-		_addOrDropPane = new BorderPane();
+		_rootPane = new BorderPane();
+		_rootPane.setPrefHeight(550); // this will be min height
+		_addOrDropContainer = new HBox();
 
 		_addOrDropComboBox = new ComboBox<String>();
 		_addOrDropComboBox.getSelectionModel().selectFirst();
-		_addOrDropComboBox.setPrefWidth(744);
+		_addOrDropComboBox.setPrefWidth(992);
 		_addOrDropComboBox.setItems(FXCollections.observableArrayList("Drop", "Add"));
 		_addOrDropComboBox.getSelectionModel().selectFirst(); // set Drop as
 																// default
@@ -93,31 +94,34 @@ public class PerformSwapStage extends KarenStage {
 		// because default is drop set initial text to be that
 		_addOrDropButton = new Button("Drop");
 		_addOrDropButton.setDisable(true);
-		_addOrDropButton.setPrefWidth(744);
+		_addOrDropButton.setPrefWidth(992);
 		_addOrDropButton.setOnAction(this::addDropButtonPress);
 
 		_addOrDropComboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addOrDrop = newValue;
 			if (_addOrDrop.equals("Add")) {
-				_addOrDropPane.getChildren().clear();
-				_addOrDropPane.setTop(_addOrDropComboBox);
-				_addOrDropPane.setBottom(_addOrDropButton);
+				_rootPane.getChildren().clear();
+				_rootPane.setTop(_addOrDropComboBox);
+				_rootPane.setCenter(_addOrDropContainer);
+				_rootPane.setBottom(_addOrDropButton);
 				_addOrDropButton.setText("Add");
 				setupForAdd();
 			} else {
-				_addOrDropPane.getChildren().clear();
-				_addOrDropPane.setTop(_addOrDropComboBox);
-				_addOrDropPane.setBottom(_addOrDropButton);
+				_rootPane.getChildren().clear();
+				_rootPane.setTop(_addOrDropComboBox);
+				_rootPane.setCenter(_addOrDropContainer);
+				_rootPane.setBottom(_addOrDropButton);
 				_addOrDropButton.setText("Drop");
 				setupForDrop();
 			}
 		});
-		_addOrDropPane.setTop(_addOrDropComboBox);
+		_rootPane.setTop(_addOrDropComboBox);
+		_rootPane.setCenter(_addOrDropContainer);
 
 		this.setupForDrop(); // first time through we want to setup for drop
 
-		_addOrDropPane.setBottom(_addOrDropButton);
-		return _addOrDropPane;
+		_rootPane.setBottom(_addOrDropButton);
+		return _rootPane;
 	}
 
 	private void performSwap(ActionEvent event) {
@@ -126,7 +130,7 @@ public class PerformSwapStage extends KarenStage {
 		Employee swapEmployee1 = _topBox.getSwapEmployee();
 		int swapDay1 = _topBox.getSwapDay();
 		int swapHour1 = _topBox.getSwapHour();
-		Schedule swapSchedule2 = _topBox.getSwapSchedule();
+		Schedule swapSchedule2 = _bottomBox.getSwapSchedule();
 		Employee swapEmployee2 = _bottomBox.getSwapEmployee();
 		int swapDay2 = _bottomBox.getSwapDay();
 		int swapHour2 = _bottomBox.getSwapHour();
@@ -226,9 +230,8 @@ public class PerformSwapStage extends KarenStage {
 
 	private void setupForDrop() {
 		_addOrDropButton.setDisable(true);
-		
-		BorderPane firstColumn = new BorderPane();
-		
+		_addOrDropContainer.getChildren().clear();
+				
 		List<String> scheduleListNames = new ArrayList<String>();
 		for (Schedule s :_ui.getSchedules()) {
 			scheduleListNames.add(s.getDatesValid());
@@ -236,37 +239,34 @@ public class PerformSwapStage extends KarenStage {
 		
 		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
 		ListView<String> scheduleListView = new ListView<String>(scheduleList);
+		//scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
 		
-		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
-		ListView<String> dayListView = new ListView<String>(dayList);
+		ListView<String> dayListView = new ListView<String>();
 		
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
 					.observableArrayList(_ui.getDaysList());
 			dayListView.setItems(days);
+			//dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
 
-		
 
-		firstColumn.setTop(scheduleListView);
-		firstColumn.setBottom(dayListView);
-		_addOrDropPane.setLeft(firstColumn);
+
 		ListView<String> hourListView = new ListView<String>();
-		_addOrDropPane.setCenter(hourListView);
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
 					.observableArrayList(_ui.getHoursList(newValue));
 			hourListView.setItems(hours);
+			//hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
 
 		ListView<Label> personListView = new ListView<Label>();
-		_addOrDropPane.setRight(personListView);
 		hourListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropHour = Integer.parseInt(newValue.split(" ")[0]);
 			if (_dropHour < 9) {
@@ -282,6 +282,7 @@ public class PerformSwapStage extends KarenStage {
 			}
 			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(scheduledEmployees);
 			personListView.setItems(people);
+			//personListView.prefHeightProperty().bind(Bindings.size(people).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
@@ -293,12 +294,24 @@ public class PerformSwapStage extends KarenStage {
 				_addOrDropButton.setDisable(false);
 			}
 		});
+
+		scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		dayListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		hourListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		personListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		
+		_addOrDropContainer.getChildren().add(scheduleListView);
+		_addOrDropContainer.getChildren().add(dayListView);
+		_addOrDropContainer.getChildren().add(hourListView);
+		_addOrDropContainer.getChildren().add(personListView);
+
+		
+		
 	}
 
 	private void setupForAdd() {
 		_addOrDropButton.setDisable(true);
-		
-		BorderPane firstColumn = new BorderPane();
+		_addOrDropContainer.getChildren().clear();
 		
 		List<String> scheduleListNames = new ArrayList<String>();
 		for (Schedule s :_ui.getSchedules()) {
@@ -308,32 +321,34 @@ public class PerformSwapStage extends KarenStage {
 		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
 		ListView<String> scheduleListView = new ListView<String>(scheduleList);
 		
-		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
-		ListView<String> dayListView = new ListView<String>(dayList);
+		ListView<String> dayListView = new ListView<String>();
+
 		
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
 					.observableArrayList(_ui.getDaysList());
 			dayListView.setItems(days);
+			dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
 
-		_addOrDropPane.setLeft(dayListView);
 		ListView<String> hourListView = new ListView<String>();
-		_addOrDropPane.setCenter(hourListView);
+
+		
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
 					.observableArrayList(_ui.getHoursList(newValue));
 			hourListView.setItems(hours);
+			hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
 
 		ListView<Label> personListView = new ListView<Label>();
-		_addOrDropPane.setRight(personListView);
+		
 		hourListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addHour = Integer.parseInt(newValue.split(" ")[0]);
 			if (_addHour < 9) {
@@ -384,7 +399,15 @@ public class PerformSwapStage extends KarenStage {
 		}
 
 		);
-
+		scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		dayListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		hourListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		personListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+		
+		_addOrDropContainer.getChildren().add(scheduleListView);
+		_addOrDropContainer.getChildren().add(dayListView);
+		_addOrDropContainer.getChildren().add(hourListView);
+		_addOrDropContainer.getChildren().add(personListView);
 	}
 
 	private void addDropButtonPress(ActionEvent event) {
