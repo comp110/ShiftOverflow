@@ -64,7 +64,7 @@ public class Storage {
     }
 
     public String get_schedule_json_folder(){
-        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/currentSchedules";
+        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/currentSchedules/";
     }
     
     public String get_schedule_leads_filename(){

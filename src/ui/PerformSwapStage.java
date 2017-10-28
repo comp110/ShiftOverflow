@@ -226,10 +226,34 @@ public class PerformSwapStage extends KarenStage {
 
 	private void setupForDrop() {
 		_addOrDropButton.setDisable(true);
-
+		
+		BorderPane firstColumn = new BorderPane();
+		
+		List<String> scheduleListNames = new ArrayList<String>();
+		for (Schedule s :_ui.getSchedules()) {
+			scheduleListNames.add(s.getDatesValid());
+		}
+		
+		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
+		ListView<String> scheduleListView = new ListView<String>(scheduleList);
+		
 		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
 		ListView<String> dayListView = new ListView<String>(dayList);
-		_addOrDropPane.setLeft(dayListView);
+		
+		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_dropSchedule = _ui.getScheduleByName(newValue);
+			javafx.collections.ObservableList<String> days = FXCollections
+					.observableArrayList(_ui.getDaysList());
+			dayListView.setItems(days);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
+		});
+
+		
+
+		firstColumn.setTop(scheduleListView);
+		firstColumn.setBottom(dayListView);
+		_addOrDropPane.setLeft(firstColumn);
 		ListView<String> hourListView = new ListView<String>();
 		_addOrDropPane.setCenter(hourListView);
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -249,7 +273,7 @@ public class PerformSwapStage extends KarenStage {
 				_dropHour += 12;
 			}
 			List<Label> scheduledEmployees = new ArrayList<Label>();
-			for (Employee e : _ui.getSchedules().getWeek().getShift(_dropDay, _dropHour)) {
+			for (Employee e : _dropSchedule.getWeek().getShift(_dropDay, _dropHour)) {
 				Label toAdd = new Label(e.getName());
 				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
@@ -262,7 +286,7 @@ public class PerformSwapStage extends KarenStage {
 			_addOrDropButton.setDisable(true);
 		});
 		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			_employeeToAddOrDrop = _ui.getSchedules().getStaff().getEmployeeByName(newValue.getText());
+			_employeeToAddOrDrop = _dropSchedule.getStaff().getEmployeeByName(newValue.getText());
 			if (_employeeToAddOrDrop == null) {
 				_addOrDropButton.setDisable(true);
 			} else {
@@ -273,9 +297,29 @@ public class PerformSwapStage extends KarenStage {
 
 	private void setupForAdd() {
 		_addOrDropButton.setDisable(true);
-
+		
+		BorderPane firstColumn = new BorderPane();
+		
+		List<String> scheduleListNames = new ArrayList<String>();
+		for (Schedule s :_ui.getSchedules()) {
+			scheduleListNames.add(s.getDatesValid());
+		}
+		
+		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
+		ListView<String> scheduleListView = new ListView<String>(scheduleList);
+		
 		javafx.collections.ObservableList<String> dayList = FXCollections.observableArrayList(_ui.getDaysList());
 		ListView<String> dayListView = new ListView<String>(dayList);
+		
+		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			_addSchedule = _ui.getScheduleByName(newValue);
+			javafx.collections.ObservableList<String> days = FXCollections
+					.observableArrayList(_ui.getDaysList());
+			dayListView.setItems(days);
+			_employeeToAddOrDrop = null;
+			_addOrDropButton.setDisable(true);
+		});
+
 		_addOrDropPane.setLeft(dayListView);
 		ListView<String> hourListView = new ListView<String>();
 		_addOrDropPane.setCenter(hourListView);
@@ -296,7 +340,7 @@ public class PerformSwapStage extends KarenStage {
 				_addHour += 12;
 			}
 			List<Label> allEmployees = new ArrayList<Label>();
-			for (Employee e : _ui.getSchedules().getStaff()) {
+			for (Employee e : _addSchedule.getStaff()) {
 				Label toAdd = new Label(e.getName());
 				if (_ui.getCurrentEmployee() != null && toAdd.getText().equals(_ui.getCurrentEmployee().getName())) {
 					toAdd.setTextFill(Color.RED);
@@ -331,7 +375,7 @@ public class PerformSwapStage extends KarenStage {
 			_addOrDropButton.setDisable(true);
 		});
 		personListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-			_employeeToAddOrDrop = _ui.getSchedules().getStaff().getEmployeeByName(newValue.getText());
+			_employeeToAddOrDrop = _addSchedule.getStaff().getEmployeeByName(newValue.getText());
 			if (_employeeToAddOrDrop == null) {
 				_addOrDropButton.setDisable(true);
 			} else {
@@ -346,20 +390,20 @@ public class PerformSwapStage extends KarenStage {
 	private void addDropButtonPress(ActionEvent event) {
 
 		if (_addOrDrop.equals("Add")) {
-			_ui.getSchedules().getWeek().getShift(_addDay, _addHour).add(_employeeToAddOrDrop);
+			_addSchedule.getWeek().getShift(_addDay, _addHour).add(_employeeToAddOrDrop);
 		} else { // must be a drop
-			_ui.getSchedules().getWeek().getShift(_dropDay, _dropHour).remove(_employeeToAddOrDrop);
+			_dropSchedule.getWeek().getShift(_dropDay, _dropHour).remove(_employeeToAddOrDrop);
 
 		}
 		// tell controller to push changes
 		if (_addOrDrop.equals("Add")) {
 			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
-					_addOrDrop.toUpperCase() + ": " + _employeeToAddOrDrop + " " + Week.dayString(_addDay) + " "
+					_addOrDrop.toUpperCase() + ": " + _addSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " " + Week.dayString(_addDay) + " "
 							+ ((_addHour % 12) == 0 ? 12 : (_addHour % 12)) + " -- "
 							+ (((_addHour + 1) % 12) == 0 ? 12 : ((_addHour + 1) % 12)));
-		} else {
+		} else { //it's a drop
 			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
-					_addOrDrop.toUpperCase() + ": " + _employeeToAddOrDrop + " " + Week.dayString(_dropDay) + " "
+					_addOrDrop.toUpperCase() + ": " + _dropSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " " + Week.dayString(_dropDay) + " "
 							+ ((_dropHour % 12) == 0 ? 12 : (_dropHour % 12)) + " -- "
 							+ (((_dropHour + 1) % 12) == 0 ? 12 : ((_dropHour + 1) % 12)));
 		}

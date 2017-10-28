@@ -81,7 +81,7 @@ public class Parser {
 		return new Employee(name, onyen, capacity, gender.equals("M") ? false : true, level, availability);
 	}
 
-	public List<Schedule> parseSchedule(String scheduleFolderPath, String staff_dir, String leadsFile) throws Exception {
+	public List<Schedule> parseSchedules(String scheduleFolderPath, String staff_dir, String leadsFile) throws Exception {
 		
 		List<Schedule> schedules = new ArrayList<Schedule>();
 
@@ -89,18 +89,24 @@ public class Parser {
 		Gson gson = new Gson();
 		String json = "";
 
-		File scheduleFile = null;
+		File scheduleFilePath = null;
 		try {
-			scheduleFile = new File(scheduleFolderPath);
+			scheduleFilePath = new File(scheduleFolderPath);
 
 		} catch (Exception e) {
+			System.err.println("error in parseSchedules");
 			throw new Exception("Parser::parseSchedule(): Error reading schedule folder=" + scheduleFolderPath);
 		}
-		
-		for (File scheduleJson : scheduleFile.listFiles()) {
-			Scanner scanner = new Scanner(scheduleFile);
-			scanner.useDelimiter("\\Z");
-			json = scanner.next();
+		for (File scheduleJson : scheduleFilePath.listFiles()) {
+			Scanner scanner = null;
+			try {
+				scanner = new Scanner(scheduleJson);
+				scanner.useDelimiter("\\Z");
+				json = scanner.nextLine();
+			} catch (Exception e) {
+				System.err.println(e.toString());
+				throw new Exception("Parser::parseSchedule(): Error reading schedule file= "+ scheduleJson.getAbsolutePath());
+			}
 			scanner.close();
 
 			// create the json week object
