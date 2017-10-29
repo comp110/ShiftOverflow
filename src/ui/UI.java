@@ -292,7 +292,7 @@ public class UI extends Application {
 		if (currentVersion.equals("")) { //if we couldn't find version file just don't worry about it
 			return;
 		}
-		if (currentVersion != UI.VERSION) {
+		if (!currentVersion.equals(UI.VERSION)) {
 			// tell user they need to update
 			displayMessage("You are not using the current version of ShiftOverflow. The current version is v" + currentVersion + ". Please close and update by visiting\ngithub.com/comp110/ShiftOverflow/releases/tag/v" + currentVersion + " before continuing.", false);
 		}
