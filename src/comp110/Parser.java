@@ -8,10 +8,14 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import com.google.gson.Gson;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.time.Year;
 
 /* Created by Keith Whitley */
 
@@ -153,15 +157,15 @@ public class Parser {
 				}
 			}
 			Leads leads = this.parseLeads(leadsFile, staff);
-			schedules.add(new Schedule(staff, week, leads,
-					scheduleJson.getName().substring(9, scheduleJson.getName().length()).split("\\.")[0])); // grab
-																											// just
-																											// the
-																											// date
-																											// portion
-																											// of
-																											// file
-																											// name
+			String scheduleDateRange = scheduleJson.getName().substring(9, scheduleJson.getName().length()).split("\\.")[0]; // grab just date of file name
+			// need to -1 on month field because it is zero indexed
+			// https://stackoverflow.com/questions/45996752/calendar-getcalendar-year-returns-wrong-year
+			Date startDate = new Date(Year.now().getValue() - 1900, Integer.parseInt(scheduleDateRange.substring(0, 2)) - 1, Integer.parseInt(scheduleDateRange.substring(3, 5)));
+			Date endDate = new Date(Year.now().getValue() - 1900, Integer.parseInt(scheduleDateRange.substring(6, 8)) - 1, Integer.parseInt(scheduleDateRange.substring(9, 11)));
+			if (!new Date().after(endDate)) { // new date is current date time
+				schedules.add(new Schedule(staff, week, leads, scheduleDateRange));
+			}
+					
 		}
 
 		if (schedules.size() == 0) {
