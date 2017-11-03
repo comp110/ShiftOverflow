@@ -8,13 +8,21 @@ import comp110.Controller;
 import comp110.Employee;
 import comp110.Schedule;
 import comp110.Week;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -138,13 +146,43 @@ public class ScheduleStage extends KarenStage {
 							scheduledEmployee.setFill(Color.RED);
 						}
 						// +1 to account for day row
-						schedulePane.add(new TextFlow(scheduledEmployee), day + 1, hourRow + i + 1);
+						TextFlow tf = new TextFlow (scheduledEmployee);
+//						if (i == max - 1) {
+//							tf.setBorder(new Border(new BorderStroke(Color.BLACK, Color.BLACK, Color.BLACK, Color.BLACK,
+//						            BorderStrokeStyle.NONE, BorderStrokeStyle.NONE, BorderStrokeStyle.SOLID, BorderStrokeStyle.NONE,
+//						            CornerRadii.EMPTY, BorderWidths.DEFAULT, Insets.EMPTY)));	
+//						}
+						schedulePane.add(tf, day + 1, hourRow + i + 1);
 					}
 				}
 			}
 			hourRow += max;
 		}
+		
+		//setup borders
+		for (int day = 0; day < 7; day++) {
+			for (int hour = getEarliestHour(schedule.getWeek()); hour < getLatestHour(schedule.getWeek()); hour++) {
+				int max = getMaxSize(hour, schedule.getWeek());
+			    TextFlow tf= (TextFlow) this.getNodeByIndex(day, hour + max, schedulePane);
+			}			
+		}
+
+		
 		return schedulePane;
+	}
+	
+	public Node getNodeByIndex (int row, int column, GridPane gridPane) {
+	    Node result = null;
+	    ObservableList<Node> childrens = gridPane.getChildren();
+
+	    for (Node node : childrens) {
+	        if(GridPane.getRowIndex(node) == row && GridPane.getColumnIndex(node) == column) {
+	            result = node;
+	            break;
+	        }
+	    }
+
+	    return result;
 	}
 	
 	// gets earliest scheduled hour in the week
