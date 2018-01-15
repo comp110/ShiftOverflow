@@ -60,7 +60,7 @@ public class Storage {
     }
 
     public String get_availability_csv_filename_from_onyen(String onyen){
-        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/spring-18/staff/" + onyen + ".csv";
+        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/fall-17/staff/" + onyen + ".csv";
     }
 
     public String get_schedule_json_folder(){
@@ -76,7 +76,7 @@ public class Storage {
     }
 
     public String get_path_to_onyen_csv_directory(){
-        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/spring-18/staff/";
+        return this.m_application_directory + DEFAULT_LOCAL_REPO_FOLDER + "/data/fall-17/staff/";
     }
 
     public void get_files(){
