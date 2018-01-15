@@ -35,7 +35,7 @@ public class UI extends Application {
 	private ScheduleStage _scheduleStage;
 	private ViewSwapsStage _viewSwapsStage; 
 	
-	private static final String VERSION = "0.4.1";
+	private static final String VERSION = "0.4.2";
 
 
 	@Override
