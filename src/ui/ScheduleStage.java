@@ -70,6 +70,7 @@ public class ScheduleStage extends KarenStage {
 					.addListener((obs, oldVal, newVal) -> this.setHeight(newVal.doubleValue()));
 			scroll.prefWidthProperty().addListener((obs, oldVal, newVal) -> this.setWidth(newVal.doubleValue()));
 			tab.setContent(scroll);
+			
 			tab.setText(schedule.getDatesValid());
 			tabs.getTabs().add(tab);
 		}
@@ -78,7 +79,14 @@ public class ScheduleStage extends KarenStage {
         	_currentlyOpenedTabTitle = newValue.getText();
         });
 		
-		// reopen last open tab if there was one
+		for (Tab t : tabs.getTabs()) {
+			if (t.getText().contains("OH")) {
+				tabs.getSelectionModel().select(t);
+				break;
+			}
+		}
+        
+        // reopen last open tab if there was one
 		if (_currentlyOpenedTabTitle != null) {
 			for (Tab t : tabs.getTabs()) {
 				if (t.getText().equals(_currentlyOpenedTabTitle)) {

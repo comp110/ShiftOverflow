@@ -246,7 +246,7 @@ public class PerformSwapStage extends KarenStage {
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
-					.observableArrayList(_ui.getDaysList());
+					.observableArrayList(_ui.getDaysList(_dropSchedule));
 			dayListView.setItems(days);
 			//dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -259,7 +259,7 @@ public class PerformSwapStage extends KarenStage {
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
-					.observableArrayList(_ui.getHoursList(newValue));
+					.observableArrayList(_ui.getHoursList(_dropSchedule, newValue));
 			hourListView.setItems(hours);
 			//hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -327,7 +327,7 @@ public class PerformSwapStage extends KarenStage {
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
-					.observableArrayList(_ui.getDaysList());
+					.observableArrayList(_ui.getDaysList(_addSchedule));
 			dayListView.setItems(days);
 			dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -340,7 +340,7 @@ public class PerformSwapStage extends KarenStage {
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
-					.observableArrayList(_ui.getHoursList(newValue));
+					.observableArrayList(_ui.getHoursList(_addSchedule, newValue));
 			hourListView.setItems(hours);
 			hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;

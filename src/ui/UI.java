@@ -35,7 +35,7 @@ public class UI extends Application {
 	private ScheduleStage _scheduleStage;
 	private ViewSwapsStage _viewSwapsStage; 
 	
-	private static final String VERSION = "0.4.2";
+	private static final String VERSION = "0.4.3";
 
 
 	@Override
@@ -247,12 +247,12 @@ public class UI extends Application {
 	}
 	
 	// only return a list of days that have scheduled shifts in them
-	public List<String> getDaysList() {
+	public List<String> getDaysList(Schedule schedule) {
 		List<String> daysList = new ArrayList<String>();
 		for (int day = 0; day < 7; day++) {
-			for (int hour = 0; hour < this.getSchedules().get(0).getWeek().getShifts()[day].length; hour++) {
+			for (int hour = 0; hour < schedule.getWeek().getShifts()[day].length; hour++) {
 				// if at least one shift is populated
-				if (this.getSchedules().get(0).getWeek().getShifts()[day][hour].size() > 0
+				if (schedule.getWeek().getShifts()[day][hour].size() > 0
 						&& !daysList.contains(Week.dayString(day))) {
 					daysList.add(Week.dayString(day));
 				}
@@ -262,27 +262,27 @@ public class UI extends Application {
 		return daysList;
 	}
 
-	public List<String> getHoursList(String day) {
+	public List<String> getHoursList(Schedule schedule, String day) {
 		List<String> hoursList = new ArrayList<String>();
 		int minHour = -1;
 		// find min
-		for (int i = 0; i < this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)].length; i++) {
-			if (this.getSchedules().get(0).getWeek().getShift(Week.dayInt(day), i).size() > 0) {
+		for (int i = 0; i < schedule.getWeek().getShifts()[Week.dayInt(day)].length; i++) {
+			if (schedule.getWeek().getShift(Week.dayInt(day), i).size() > 0) {
 				minHour = i;
 				break;
 			}
 		}
 		// find max
 		int maxHour = -1;
-		for (int i = this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][minHour]
-				.getHour(); i < this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)].length; i++) {
-			if (this.getSchedules().get(0).getWeek().getShift(Week.dayInt(day), i).size() == 0) {
+		for (int i = schedule.getWeek().getShifts()[Week.dayInt(day)][minHour]
+				.getHour(); i < schedule.getWeek().getShifts()[Week.dayInt(day)].length; i++) {
+			if (schedule.getWeek().getShift(Week.dayInt(day), i).size() == 0) {
 				break;
 			}
 			maxHour = i;
 		}
-		for (int i = this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][minHour]
-				.getHour(); i <= this.getSchedules().get(0).getWeek().getShifts()[Week.dayInt(day)][maxHour].getHour(); i++) {
+		for (int i = schedule.getWeek().getShifts()[Week.dayInt(day)][minHour]
+				.getHour(); i <= schedule.getWeek().getShifts()[Week.dayInt(day)][maxHour].getHour(); i++) {
 			hoursList.add(((i % 12) == 0 ? 12 : (i % 12)) + " -- " + (((i + 1) % 12) == 0 ? 12 : ((i + 1) % 12)));
 		}
 		return hoursList;
