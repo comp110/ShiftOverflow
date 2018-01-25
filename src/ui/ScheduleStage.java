@@ -8,7 +8,9 @@ import comp110.Controller;
 import comp110.Employee;
 import comp110.Schedule;
 import comp110.Week;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -18,8 +20,6 @@ import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 
@@ -96,37 +96,58 @@ public class ScheduleStage extends KarenStage {
 		}
 
 		Scene scene = new Scene(tabs);
+		scene.getStylesheets().add("Borders.css");
 		this.setScene(scene);
 		this.sizeToScene();
 	}
 	
 	public GridPane writeSchedule(Schedule schedule) {
 		GridPane schedulePane = new GridPane();
-		schedulePane.setAlignment(Pos.CENTER);
-		schedulePane.setGridLinesVisible(true);
-		ArrayList<ArrayList<ArrayList<Employee>>> shifts = shiftsAsArray(schedule.getWeek());
-
-		for (int day = 0; day < 7; day++) {
-			// +1 for hour column
-			schedulePane.add(new Label(Week.dayString(day)), day + 1, 0);
-		}
-
+		
 		//Load the fonts
 		InputStream is = getClass().getResourceAsStream("segoeui.ttf");
         Font font = Font.loadFont(is, 12.0);   
 		InputStream is2 = getClass().getResourceAsStream("segoeuibold.ttf");
         Font boldFont = Font.loadFont(is2, 12.0);
 		
+		schedulePane.setAlignment(Pos.CENTER);
+		//schedulePane.setGridLinesVisible(true);
+		ArrayList<ArrayList<ArrayList<Employee>>> shifts = shiftsAsArray(schedule.getWeek());
+		TextFlow firstBlock = new TextFlow(new Text());
+		firstBlock.getStyleClass().add("newHour");
+		schedulePane.add(firstBlock, 0, 0);
+		for (int day = 0; day < 7; day++) {
+			// +1 for hour column
+			Text test = new Text(Week.dayString(day));
+			test.setFont(font);
+			TextFlow h = new TextFlow(test);
+			String style = "newHour";
+			h.getStyleClass().add(style);
+			schedulePane.add(h, day + 1, 0);
+		}
 		
 		int hourRow = 0;
+		int prevHourRow = hourRow;
 		for (int hour = getEarliestHour(schedule.getWeek()); hour < getLatestHour(schedule.getWeek()); hour++) {
-			Label dayLabel = new Label(
+			
+			Text dayLabel = new Text(
 					(hour % 12 == 0 ? 12 : hour % 12) + " -- " + ((hour + 1) % 12 == 0 ? 12 : (hour + 1) % 12));
-			dayLabel.setMaxWidth(Double.MAX_VALUE);
-			dayLabel.setAlignment(Pos.CENTER);
+			//dayLabel.setMaxWidth(Double.MAX_VALUE);
+			//dayLabel.setAlignment(Pos.CENTER);
+			dayLabel.setFont(font);
 			// +1 to account for day row
-			schedulePane.add(dayLabel, 0, hourRow + 1);
-
+			TextFlow dayLabelWrapper = new TextFlow(dayLabel);
+			dayLabelWrapper.getStyleClass().add("newHour");
+			schedulePane.add(dayLabelWrapper, 0, hourRow + 1);
+			
+			for (int i = prevHourRow + 2; i < hourRow + 1; i++){
+				Text test = new Text();
+				TextFlow h = new TextFlow(test);
+				h.getStyleClass().add("notNewHour");
+				schedulePane.add(h, 0, i);
+			}
+			prevHourRow = hourRow;
+			
 			int max = getMaxSize(hour, schedule.getWeek());
 
 			for (int i = 0; i < max; i++) {
@@ -146,12 +167,24 @@ public class ScheduleStage extends KarenStage {
 							scheduledEmployee.setFill(Color.RED);
 						}
 						// +1 to account for day row
-						schedulePane.add(new TextFlow(scheduledEmployee), day + 1, hourRow + i + 1);
+						TextFlow x = new TextFlow(scheduledEmployee);
+						if (i == 0) x.getStyleClass().add("newHour");
+						
+						else x.getStyleClass().add("notNewHour");
+						schedulePane.add(x, day + 1, hourRow + i + 1);
+					}
+					else {
+						Text y = new Text();
+						TextFlow x = new TextFlow(y);
+						String style = i == 0 ? "newHour" : "notNewHour";
+						x.getStyleClass().add(style);
+						schedulePane.add(x, day + 1, hourRow + i + 1);
 					}
 				}
 			}
 			hourRow += max;
 		}
+		
 		return schedulePane;
 	}
 	

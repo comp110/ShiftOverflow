@@ -1,0 +1,29 @@
+.newHour {
+	-fx-border-style: solid;
+	-fx-border-width: 5px 0px 0px 5px;
+	-fx-border-color: "black" "black" #d3d3d3 "black";
+	-fx-margin: 0px;
+	-fx-padding: 0px;
+}
+
+.notNewHour {
+	-fx-border-style: solid;
+	-fx-border-width: 5px 0px 0px 5px;
+	-fx-border-color: #d3d3d3 "black" #d3d3d3 "black" ;
+	-fx-margin: 0px;
+	-fx-padding: 0px;
+}
+
+.hourOne{
+	-fx-border-width: 0px 5px 0px 5px;
+	-fx-border-color: "black";
+	-fx-margin: 0px;
+	-fx-padding: 0px;
+}
+
+.hourNotOne {
+	-fx-border-width: 0px 5px 0px 0px;
+	-fx-border-color: "black";
+	-fx-margin: 0px;
+	-fx-padding: 0px;
+}

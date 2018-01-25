@@ -22,6 +22,7 @@ public class SwapBox extends HBox {
 	private Employee _swapEmployee;
 	private ListView<Label> _personListView;
 	private UI _ui;
+	private Schedule _ohSchedule;
 
 	public SwapBox(UI ui) {
 		_ui = ui;
@@ -37,9 +38,12 @@ public class SwapBox extends HBox {
 		
 		
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			String ohSchedName = newValue.replaceAll("Tutoring", "OH");
+			ohSchedName = ohSchedName .replaceAll("Grading", "OH");
+			_ohSchedule = _ui.getScheduleByName(ohSchedName);
 			_swapSchedule = _ui.getScheduleByName(newValue); // newValue will be the dateValid property of the schedule
 			javafx.collections.ObservableList<String> days = FXCollections
-					.observableArrayList(_ui.getDaysList(_swapSchedule));
+					.observableArrayList(_ui.getDaysList(_ohSchedule));
 			// newValue is the new day
 			dayListView.setItems(days);
 			dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
@@ -54,7 +58,7 @@ public class SwapBox extends HBox {
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_swapDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
-					.observableArrayList(_ui.getHoursList(_swapSchedule, newValue));
+					.observableArrayList(_ui.getHoursList(_ohSchedule, newValue));
 			// newValue is the new day
 			hourListView.setItems(hours);
 			hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));

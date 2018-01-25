@@ -46,6 +46,7 @@ public class PerformSwapStage extends KarenStage {
 	private int _addDay;
 	private int _addHour;
 	private Employee _employeeToAddOrDrop;
+	private Schedule _ohSchedule;
 
 	public PerformSwapStage(String title, Controller controller, UI ui) {
 		super(title, controller, ui);
@@ -246,9 +247,12 @@ public class PerformSwapStage extends KarenStage {
 		ListView<String> dayListView = new ListView<String>();
 
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			String ohSchedName = newValue.replaceAll("Tutoring", "OH");
+			ohSchedName = ohSchedName .replaceAll("Grading", "OH");
 			_dropSchedule = _ui.getScheduleByName(newValue);
+			_ohSchedule = _ui.getScheduleByName(ohSchedName);
 			javafx.collections.ObservableList<String> days = FXCollections
-					.observableArrayList(_ui.getDaysList(_dropSchedule));
+					.observableArrayList(_ui.getDaysList(_ohSchedule));
 			dayListView.setItems(days);
 			// dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -259,7 +263,7 @@ public class PerformSwapStage extends KarenStage {
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
-					.observableArrayList(_ui.getHoursList(_dropSchedule, newValue));
+					.observableArrayList(_ui.getHoursList(_ohSchedule, newValue));
 			hourListView.setItems(hours);
 			// hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -322,9 +326,13 @@ public class PerformSwapStage extends KarenStage {
 		ListView<String> dayListView = new ListView<String>();
 
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			String ohSchedName = newValue.replaceAll("Tutoring", "OH");
 			_addSchedule = _ui.getScheduleByName(newValue);
+			ohSchedName = ohSchedName .replaceAll("Grading", "OH");
+			
+			_ohSchedule = _ui.getScheduleByName(ohSchedName);
 			javafx.collections.ObservableList<String> days = FXCollections
-					.observableArrayList(_ui.getDaysList(_addSchedule));
+					.observableArrayList(_ui.getDaysList(_ohSchedule));
 			dayListView.setItems(days);
 			dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
@@ -334,9 +342,11 @@ public class PerformSwapStage extends KarenStage {
 		ListView<String> hourListView = new ListView<String>();
 
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+			String schedName = _addSchedule.getDatesValid().replaceAll("Tutoring", "OH");
+			schedName = schedName.replaceAll("Grading", "OH");
 			_addDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
-					.observableArrayList(_ui.getHoursList(_addSchedule, newValue));
+					.observableArrayList(_ui.getHoursList(_ohSchedule, newValue));
 			hourListView.setItems(hours);
 			hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
