@@ -45,7 +45,7 @@ public class UI extends Application {
 
 		// create the dialog to collect github username/password
 		// and show it as the first thing
-		_passwordStage = new KarenStage("Password", _controller, null);
+		_passwordStage = new KarenStage("Github Login", _controller, null);
 		Group passwordGroup = new Group();
 		Scene passwordScene = new Scene(passwordGroup);
 		_passwordStage.setScene(passwordScene);
