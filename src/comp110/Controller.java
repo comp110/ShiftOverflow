@@ -48,8 +48,9 @@ public class Controller implements Storage.StorageListener {
 		} catch (Exception e) {
 			// tell the ui things suck
 			this.m_ui.setSchedules(null);
-			Platform.runLater(
-					() -> this.m_ui.displayMessage("Controller::storage_get_files_complete(): " + e.toString()));
+			//Only want one error message
+			/*Platform.runLater(
+					() -> this.m_ui.displayMessage("Controller::storage_get_files_complete(): " + e.toString()));*/
 		}
 	}
 

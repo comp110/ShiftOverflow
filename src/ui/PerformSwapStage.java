@@ -221,39 +221,39 @@ public class PerformSwapStage extends KarenStage {
 		swapSchedule2.getWeek().getShift(swapDay2, swapHour2).add(swapEmployee1);
 
 		// tell controller to push changes
-		_controller.uiRequestChangeSchedule(_ui.getSchedules(), "SWAPPED: " + swapSchedule1.getDatesValid() + " "+ swapEmployee1.getName() + " "
-				+ Week.dayString(swapDay1) + " " + ((swapHour1 % 12) == 0 ? 12 : (swapHour1 % 12)) + " -- "
-				+ (((swapHour1 + 1) % 12) == 0 ? 12 : ((swapHour1 + 1) % 12)) + " with " + swapSchedule2.getDatesValid() + " " + swapEmployee2.getName() + " "
-				+ Week.dayString(swapDay2) + " " + ((swapHour2 % 12) == 0 ? 12 : (swapHour2 % 12)) + " -- "
-				+ (((swapHour2 + 1) % 12) == 0 ? 12 : ((swapHour2 + 1) % 12)));
+		_controller.uiRequestChangeSchedule(_ui.getSchedules(),
+				"SWAPPED: " + swapSchedule1.getDatesValid() + " " + swapEmployee1.getName() + " "
+						+ Week.dayString(swapDay1) + " " + ((swapHour1 % 12) == 0 ? 12 : (swapHour1 % 12)) + " -- "
+						+ (((swapHour1 + 1) % 12) == 0 ? 12 : ((swapHour1 + 1) % 12)) + " with "
+						+ swapSchedule2.getDatesValid() + " " + swapEmployee2.getName() + " " + Week.dayString(swapDay2)
+						+ " " + ((swapHour2 % 12) == 0 ? 12 : (swapHour2 % 12)) + " -- "
+						+ (((swapHour2 + 1) % 12) == 0 ? 12 : ((swapHour2 + 1) % 12)));
 	}
 
 	private void setupForDrop() {
 		_addOrDropButton.setDisable(true);
 		_addOrDropContainer.getChildren().clear();
-				
+
 		List<String> scheduleListNames = new ArrayList<String>();
-		for (Schedule s :_ui.getSchedules()) {
+		for (Schedule s : _ui.getSchedules()) {
 			scheduleListNames.add(s.getDatesValid());
 		}
-		
+
 		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
 		ListView<String> scheduleListView = new ListView<String>(scheduleList);
-		//scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
-		
+		// scheduleListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
+
 		ListView<String> dayListView = new ListView<String>();
-		
+
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_dropSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
 					.observableArrayList(_ui.getDaysList(_dropSchedule));
 			dayListView.setItems(days);
-			//dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
+			// dayListView.prefHeightProperty().bind(Bindings.size(days).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
-
-
 
 		ListView<String> hourListView = new ListView<String>();
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -261,7 +261,7 @@ public class PerformSwapStage extends KarenStage {
 			javafx.collections.ObservableList<String> hours = FXCollections
 					.observableArrayList(_ui.getHoursList(_dropSchedule, newValue));
 			hourListView.setItems(hours);
-			//hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
+			// hourListView.prefHeightProperty().bind(Bindings.size(hours).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
@@ -282,7 +282,7 @@ public class PerformSwapStage extends KarenStage {
 			}
 			javafx.collections.ObservableList<Label> people = FXCollections.observableArrayList(scheduledEmployees);
 			personListView.setItems(people);
-			//personListView.prefHeightProperty().bind(Bindings.size(people).multiply(24));
+			// personListView.prefHeightProperty().bind(Bindings.size(people).multiply(24));
 			_employeeToAddOrDrop = null;
 			_addOrDropButton.setDisable(true);
 		});
@@ -299,31 +299,28 @@ public class PerformSwapStage extends KarenStage {
 		dayListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
 		hourListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
 		personListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
-		
+
 		_addOrDropContainer.getChildren().add(scheduleListView);
 		_addOrDropContainer.getChildren().add(dayListView);
 		_addOrDropContainer.getChildren().add(hourListView);
 		_addOrDropContainer.getChildren().add(personListView);
 
-		
-		
 	}
 
 	private void setupForAdd() {
 		_addOrDropButton.setDisable(true);
 		_addOrDropContainer.getChildren().clear();
-		
+
 		List<String> scheduleListNames = new ArrayList<String>();
-		for (Schedule s :_ui.getSchedules()) {
+		for (Schedule s : _ui.getSchedules()) {
 			scheduleListNames.add(s.getDatesValid());
 		}
-		
+
 		javafx.collections.ObservableList<String> scheduleList = FXCollections.observableArrayList(scheduleListNames);
 		ListView<String> scheduleListView = new ListView<String>(scheduleList);
-		
+
 		ListView<String> dayListView = new ListView<String>();
 
-		
 		scheduleListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addSchedule = _ui.getScheduleByName(newValue);
 			javafx.collections.ObservableList<String> days = FXCollections
@@ -336,7 +333,6 @@ public class PerformSwapStage extends KarenStage {
 
 		ListView<String> hourListView = new ListView<String>();
 
-		
 		dayListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addDay = Week.dayInt(newValue);
 			javafx.collections.ObservableList<String> hours = FXCollections
@@ -348,7 +344,7 @@ public class PerformSwapStage extends KarenStage {
 		});
 
 		ListView<Label> personListView = new ListView<Label>();
-		
+
 		hourListView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
 			_addHour = Integer.parseInt(newValue.split(" ")[0]);
 			if (_addHour < 9) {
@@ -403,7 +399,7 @@ public class PerformSwapStage extends KarenStage {
 		dayListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
 		hourListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
 		personListView.prefHeightProperty().bind(Bindings.size(scheduleList).multiply(24));
-		
+
 		_addOrDropContainer.getChildren().add(scheduleListView);
 		_addOrDropContainer.getChildren().add(dayListView);
 		_addOrDropContainer.getChildren().add(hourListView);
@@ -421,13 +417,13 @@ public class PerformSwapStage extends KarenStage {
 		// tell controller to push changes
 		if (_addOrDrop.equals("Add")) {
 			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
-					_addOrDrop.toUpperCase() + ": " + _addSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " " + Week.dayString(_addDay) + " "
-							+ ((_addHour % 12) == 0 ? 12 : (_addHour % 12)) + " -- "
+					_addOrDrop.toUpperCase() + ": " + _addSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " "
+							+ Week.dayString(_addDay) + " " + ((_addHour % 12) == 0 ? 12 : (_addHour % 12)) + " -- "
 							+ (((_addHour + 1) % 12) == 0 ? 12 : ((_addHour + 1) % 12)));
-		} else { //it's a drop
+		} else { // it's a drop
 			_controller.uiRequestChangeSchedule(_ui.getSchedules(),
-					_addOrDrop.toUpperCase() + ": " + _dropSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " " + Week.dayString(_dropDay) + " "
-							+ ((_dropHour % 12) == 0 ? 12 : (_dropHour % 12)) + " -- "
+					_addOrDrop.toUpperCase() + ": " + _dropSchedule.getDatesValid() + " " + _employeeToAddOrDrop + " "
+							+ Week.dayString(_dropDay) + " " + ((_dropHour % 12) == 0 ? 12 : (_dropHour % 12)) + " -- "
 							+ (((_dropHour + 1) % 12) == 0 ? 12 : ((_dropHour + 1) % 12)));
 		}
 	}
